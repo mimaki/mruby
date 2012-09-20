@@ -1,10 +1,15 @@
 # Makefile description.
 # basic build file for mruby
 
+# target compiler
+ifeq ($(strip $(TARGET)),arm)
+  COMPILE_TARGET = arm-linux-gnueabi-
+endif
+
 # compiler, linker (gcc), archiver, parser generator
-export CC = gcc
-export LL = gcc
-export AR = ar
+export CC = $(COMPILE_TARGET)gcc
+export LL = $(COMPILE_TARGET)gcc
+export AR = $(COMPILE_TARGET)ar
 export YACC = bison
 
 ifeq ($(strip $(COMPILE_MODE)),)
