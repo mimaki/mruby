@@ -12,8 +12,8 @@ RLIB := $(TARGET).rbtmp
 DEPLIB := $(TARGET).d
 MRB1 := $(BASEDIR)/*.rb
 MRBS := $(MRB1)
-LIBR0 := ../lib/libmruby_core.a
-LIBR := ../lib/libmruby.a
+LIBR0 := ../lib/libmruby_core$(TARGET_MODULE).a
+LIBR := ../lib/libmruby$(TARGET_MODULE).a
 
 # libraries, includes
 INCLUDES = -I../src -I../include
@@ -75,5 +75,6 @@ $(RLIB) : $(MRBS)
 # clean up
 .PHONY : clean
 clean :
+	@$(MAKE) clean -C ../tools/mrbc $(MAKE_FLAGS)
 	@echo "make: removing targets, objects and depend files of `pwd`"
-	-$(RM_F) $(MRBC) $(MLIB) $(CLIB) $(RLIB) $(DLIB) $(DEPLIB) $(LIBR)
+	-$(RM_F) $(MLIB) $(CLIB) $(RLIB) $(DLIB) $(DEPLIB) $(LIBR)

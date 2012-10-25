@@ -9,6 +9,7 @@
 #include "mruby/variable.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <fcntl.h>
 #if defined(_WIN32) || defined(_WIN64)
 #define BUTTON_CLASS "c:/temp/input/button"
@@ -41,13 +42,13 @@ btn_ison(mrb_state *mrb, mrb_value btn)
   close(fd);
 
   if (rc != sizeof(buf)) {
-    v = mrb_iv_get(mrb, btn, mrb_intern(mrb, "on"));
+    v = mrb_iv_get(mrb, btn, mrb_intern(mrb, "@on"));
     return mrb_nil_p(v) ? mrb_false_value() : v;
   }
 
   v = (buf[EVENTOFFSET] == 0) ? mrb_false_value() : mrb_true_value();
 
-  mrb_iv_set(mrb, btn, mrb_intern(mrb, "on"), v);
+  mrb_iv_set(mrb, btn, mrb_intern(mrb, "@on"), v);
 
   return v;
 }

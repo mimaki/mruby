@@ -9,6 +9,7 @@
 #include "mruby/variable.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <fcntl.h>
 #if defined(_WIN32) || defined(_WIN64)
 #define LED_CLASS_PATH "c:/temp/leds"
@@ -53,7 +54,7 @@ led_init(mrb_state *mrb, mrb_value self)
     mrb_raise(mrb, E_ARGUMENT_ERROR, "Invalid LED number (%d)", c);
   }
 
-  mrb_iv_set(mrb, self, mrb_intern(mrb, "color"), color);
+  mrb_iv_set(mrb, self, mrb_intern(mrb, "@color"), color);
 
   return self;
 }
@@ -96,22 +97,17 @@ led_read(mrb_state *mrb, const char *path, char *buf, size_t len)
 
 /*
  * call-seq:
- *   led.on(delay=0, stay=0)  ->  nil
+ *   led.on  ->  nil
  */
 static mrb_value
 led_on(mrb_state *mrb, mrb_value led)
 {
-  mrb_value delay, stay;
   mrb_value color;
   mrb_int c;
 
-  color = mrb_iv_get(mrb, led, mrb_intern(mrb, "color"));
+  color = mrb_iv_get(mrb, led, mrb_intern(mrb, "@color"));
   c = mrb_fixnum(color);
 //printf("led.on: color=%d\n", c);
-
-  delay = stay = mrb_fixnum_value(0);
-  mrb_get_args(mrb, "|ii", &delay, &stay);
-//printf("led.on: delay=%d, stay=%d\n", mrb_fixnum(delay), mrb_fixnum(stay));
 
   led_write(mrb, ledpath[c], LED_ON, sizeof(LED_ON)-1);
 
@@ -128,7 +124,7 @@ led_off(mrb_state *mrb, mrb_value led)
   mrb_value color;
   mrb_int c;
 
-  color = mrb_iv_get(mrb, led, mrb_intern(mrb, "color"));
+  color = mrb_iv_get(mrb, led, mrb_intern(mrb, "@color"));
   c = mrb_fixnum(color);
 //printf("led.off: color=%d\n", c);
 
@@ -148,7 +144,7 @@ led_ison(mrb_state *mrb, mrb_value led)
   mrb_int c;
   char onoff[1];
 
-  color = mrb_iv_get(mrb, led, mrb_intern(mrb, "color"));
+  color = mrb_iv_get(mrb, led, mrb_intern(mrb, "@color"));
   c = mrb_fixnum(color);
 //printf("led.on?: color=%d\n", c);
 
@@ -176,7 +172,7 @@ mrb_init_led(mrb_state *mrb)
 
   /* インスタンスメソッド定義 */
   mrb_define_method(mrb, led, "initialize", led_init, ARGS_REQ(1));
-  mrb_define_method(mrb, led, "on", led_on, ARGS_OPT(2));
+  mrb_define_method(mrb, led, "on", led_on, ARGS_NONE());
   mrb_define_method(mrb, led, "off", led_off, ARGS_NONE());
   mrb_define_method(mrb, led, "on?", led_ison, ARGS_NONE());
 }

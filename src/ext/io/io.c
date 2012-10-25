@@ -1717,7 +1717,7 @@ mrb_init_io(mrb_state *mrb)
 {
   struct RClass *io;
 
-  io = /*mrb->io_class =*/ mrb_define_class(mrb, "IO", mrb->object_class);
+  io = mrb->io_class = mrb_define_class(mrb, "IO", mrb->object_class);
   MRB_SET_INSTANCE_TT(io, MRB_TT_FILE);
 
   mrb_include_module(mrb, io, mrb_class_get(mrb, "Enumerable")); /* 15.2.20.3 */

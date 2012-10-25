@@ -4,7 +4,7 @@
 # project-specific macros
 # extension of the executable-file is modifiable(.exe .out ...)
 BASEDIR = .
-TARGET := ../lib/libmruby_core.a
+TARGET := ../lib/libmruby_core$(TARGET_MODULE).a
 YSRC := $(BASEDIR)/parse.y
 YC := $(BASEDIR)/y.tab.c
 KWD := $(BASEDIR)/keywords
@@ -13,8 +13,7 @@ EXCEPT1 := $(YC) $(BASEDIR)/minimain.c
 OBJY := $(patsubst %.c,%.o,$(YC))
 OBJ1 := $(patsubst %.c,%.o,$(filter-out $(EXCEPT1),$(wildcard $(BASEDIR)/*.c)))
 OBJ2 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/ext/*/*.c))
-#OBJ2 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/ext/regex/*.c))
-#OBJ3 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/ext/enc/*.c))
+OBJ3 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/../ext/*/*.c))
 OBJS := $(OBJ1) $(OBJ2) $(OBJ3)
 
 # libraries, includes
@@ -66,7 +65,8 @@ $(LDEF) : $(KWD)
 # clean up
 .PHONY : clean #cleandep
 clean :
+	@$(MAKE) clean -C ../tools/mrbc $(MAKE_FLAGS)
 	@echo "make: removing targets, objects and depend files of `pwd`"
-	-$(RM_F) $(TARGET) $(OBJS) $(OBJY) $(YC)
+	-$(RM_F) $(OBJS) $(OBJY) $(YC)
 	-$(RM_F) $(OBJS:.o=.d) $(OBJY:.o=.d)
 	-$(RM_F) $(patsubst %.c,%.o,$(EXCEPT1)) $(patsubst %.c,%.d,$(EXCEPT1))

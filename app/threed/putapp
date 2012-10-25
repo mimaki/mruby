@@ -1,0 +1,4 @@
+#!/bin/sh
+../../bin/mrbc threed.rb
+lftp armadillo -e 'cd pub;rm -f mrubyapp;rm -f threed.mrb;put mrubyapp;put threed.mrb;quit'
+

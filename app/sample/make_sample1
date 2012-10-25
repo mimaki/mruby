@@ -1,0 +1,3 @@
+#!/bin/sh
+gcc -I../../include sample1.c ../../lib/libmruby.a -lm -o sample1
+

@@ -2,14 +2,15 @@
 # basic build file for mruby
 
 # target compiler
-ifeq ($(strip $(TARGET)),arm)
-  COMPILE_TARGET = arm-linux-gnueabi-
+ifeq ($(strip $(BUILDTARGET)),arm)
+  export TARGET_COMPILER = arm-linux-gnueabi-
+  export TARGET_MODULE = -arm
 endif
 
 # compiler, linker (gcc), archiver, parser generator
-export CC = $(COMPILE_TARGET)gcc
-export LL = $(COMPILE_TARGET)gcc
-export AR = $(COMPILE_TARGET)ar
+export CC = $(TARGET_COMPILER)gcc
+export LL = $(TARGET_COMPILER)gcc
+export AR = $(TARGET_COMPILER)ar
 export YACC = bison
 
 ifeq ($(strip $(COMPILE_MODE)),)

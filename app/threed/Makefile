@@ -1,25 +1,14 @@
 # Makefile description.
-# basic build file for mruby executable
+# basic build file for mruby application
 
 # project-specific macros
 # extension of the executable-file is modifiable(.exe .out ...)
 BASEDIR = ../../src
-TARGET := ../../bin/mruby$(TARGET_MODULE)
-LIBR := ../../lib/libmruby$(TARGET_MODULE).a
-ifeq ($(OS),Windows_NT)
-EXE := $(TARGET).exe
-else
+TARGET := ./mrubyapp
+LIBR := ../../lib/libmruby-arm.a
 EXE := $(TARGET)
-endif
-OBJ0 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/../tools/mruby/*.c))
-#OBJ1 := $(patsubst %.c,%.o,$(filter-out $(EXCEPT1),$(wildcard $(BASEDIR)/*.c)))
-#OBJ2 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/ext/regex/*.c))
-#OBJ3 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/ext/enc/*.c))
+OBJ0 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/../app/threed/mrubyapp.c))
 OBJS := $(OBJ0)
-
-# ext libraries
-#EXT1 := $(patsubst %.c,%.o,$(wildcard $(BASEDIR)/../ext/socket/*.c))
-EXTS := $(EXT1)
 
 # libraries, includes
 LIBS = -lm
@@ -53,29 +42,22 @@ endif
 all : $(LIBR) $(EXE)
 
 # executable constructed using linker from object files
-$(EXE) : $(LIBR) $(OBJS) $(EXTS)
-	$(LL) -o $@ $(CFLAGS) $(OBJS) $(LIBR) $(EXTS) $(LIBS)
+$(EXE) : $(LIBR) $(OBJS)
+	arm-linux-gnueabi-gcc -o $@ $(CFLAGS) $(OBJS) $(LIBR) $(LIBS)
 
 -include $(OBJS:.o=.d)
 
 # objects compiled from source
 $(OBJS) : %.o : %.c
-	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
+	arm-linux-gnueabi-gcc $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
 
 # C library compile
 $(LIBR) :
-	@$(MAKE) -C $(BASEDIR) $(MAKE_FLAGS)
-
-# mruby library compile
-# extend libraries complile
-$(EXTS) : %.o : %.c
-	$(CC) $(ALL_CFLAGS) -MMD $(INCLUDES) -c $< -o $@
+	@$(MAKE) -C ../../src $(MAKE_FLAGS)
 
 # clean up
-.PHONY : clean #cleandep
+.PHONY : clean
 clean :
-	$(MAKE) clean -C ../../mrblib $(MAKE_FLAGS)
-	$(MAKE) clean -C ../mrbc $(MAKE_FLAGS)
 	@echo "make: removing targets, objects and depend files of `pwd`"
-	-$(RM_F) $(OBJS)
-	-$(RM_F) $(OBJS:.o=.d)
+	-rm -f $(EXE) $(OBJS)
+	-rm -f $(OBJS:.o=.d)
