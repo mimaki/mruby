@@ -2,9 +2,36 @@
 # basic build file for mruby
 
 # compiler, linker (gcc), archiver, parser generator
-export CC = gcc
-export LL = gcc
-export AR = ar
+ifeq ($(strip $(BUILDTARGET)),arm)
+  TARGET_COMPILER = arm-linux-gnueabi-
+  export CC = $(TARGET_COMPILER)gcc
+  export LL = $(TARGET_COMPILER)gcc
+  export AR = $(TARGET_COMPILER)ar
+  export TARGET_MODULE = -arm
+else ifeq ($(strip $(BUILDTARGET)),nacl32)
+  NACLSDK = ~/workspace/nacl_sdk
+  PEPPER = pepper_23
+  NACLTOOL = linux_x86_newlib
+  TARGET_COMPILER = $(NACLSDK)/$(PEPPER)/toolchain/$(NACLTOOL)/bin/x86_64-nacl-
+  export CC = $(TARGET_COMPILER)gcc -m32
+  export LL = $(TARGET_COMPILER)g++ -m32
+  export AR = $(TARGET_COMPILER)ar
+  export TARGET_MODULE = -nacl32
+else ifeq ($(strip $(BUILDTARGET)),nacl64)
+  NACLSDK = ~/workspace/nacl_sdk
+  PEPPER = pepper_23
+  NACLTOOL = linux_x86_newlib
+  TARGET_COMPILER = $(NACLSDK)/$(PEPPER)/toolchain/$(NACLTOOL)/bin/x86_64-nacl-
+  export CC = $(TARGET_COMPILER)gcc -m64
+  export LL = $(TARGET_COMPILER)g++ -m64
+  export AR = $(TARGET_COMPILER)ar
+  export TARGET_MODULE = -nacl64
+else
+  export CC = gcc
+  export LL = gcc
+  export AR = ar
+  export TARGET_MODULE =
+endif
 export YACC = bison
 
 ifeq ($(strip $(COMPILE_MODE)),)

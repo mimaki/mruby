@@ -4,8 +4,8 @@
 # project-specific macros
 # extension of the executable-file is modifiable(.exe .out ...)
 BASEDIR = ../../src
-TARGET := ../../bin/mruby
-LIBR := ../../lib/libmruby.a
+TARGET := ../../bin/mruby$(TARGET_MODULE)
+LIBR := ../../lib/libmruby$(TARGET_MODULE).a
 ifeq ($(OS),Windows_NT)
 EXE := $(TARGET).exe
 else
@@ -77,5 +77,5 @@ clean :
 	$(MAKE) clean -C ../../mrblib $(MAKE_FLAGS)
 	$(MAKE) clean -C ../mrbc $(MAKE_FLAGS)
 	@echo "make: removing targets, objects and depend files of `pwd`"
-	-$(RM_F) $(EXE) $(OBJS)
+	-$(RM_F) $(OBJS)
 	-$(RM_F) $(OBJS:.o=.d)
