@@ -1,0 +1,16 @@
+xyz = [90, 0, 0]
+
+while true
+  acc = AccelSensor.read
+
+  xyz.each_index {|i|
+    xyz[i] = acc[i]
+  }
+
+  f = File.open("../var.js", "w")
+  f.write(xyz[0].to_s + "," + xyz[1].to_s + "," + xyz[2].to_s)
+  f.close
+
+  sleep(0.01)
+end
+
