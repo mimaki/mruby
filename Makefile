@@ -8,6 +8,7 @@ ifeq ($(strip $(BUILDTARGET)),arm)
   export LL = $(TARGET_COMPILER)gcc
   export AR = $(TARGET_COMPILER)ar
   export TARGET_MODULE = -arm
+  CFLAG0 = "-DBUILDTARGET"
 else ifeq ($(strip $(BUILDTARGET)),nacl32)
   NACLSDK = ~/workspace/nacl_sdk
   PEPPER = pepper_23
@@ -17,6 +18,7 @@ else ifeq ($(strip $(BUILDTARGET)),nacl32)
   export LL = $(TARGET_COMPILER)g++ -m32
   export AR = $(TARGET_COMPILER)ar
   export TARGET_MODULE = -nacl32
+  CFLAG0 = "-DBUILDTARGET"
 else ifeq ($(strip $(BUILDTARGET)),nacl64)
   NACLSDK = ~/workspace/nacl_sdk
   PEPPER = pepper_23
@@ -26,11 +28,13 @@ else ifeq ($(strip $(BUILDTARGET)),nacl64)
   export LL = $(TARGET_COMPILER)g++ -m64
   export AR = $(TARGET_COMPILER)ar
   export TARGET_MODULE = -nacl64
+  CFLAG0 = "-DBUILDTARGET"
 else
   export CC = gcc
   export LL = gcc
   export AR = ar
   export TARGET_MODULE =
+  CFLAG0 =
 endif
 export YACC = bison
 
@@ -47,7 +51,7 @@ else ifeq ($(COMPILE_MODE),small)
   CFLAGS = -Os
 endif
 
-ALL_CFLAGS = -Wall -Werror-implicit-function-declaration $(CFLAGS)
+ALL_CFLAGS = -Wall -Werror-implicit-function-declaration $(CFLAGS) $(CFLAG0)
 ifeq ($(OS),Windows_NT)
   MAKE_FLAGS = --no-print-directory CC=$(CC) LL=$(LL) ALL_CFLAGS='$(ALL_CFLAGS)'
 else

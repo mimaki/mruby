@@ -247,3 +247,8 @@ main(void)
 
   return 0;
 }
+
+void
+putConsole(const char *str)
+{
+}
