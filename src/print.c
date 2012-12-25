@@ -9,19 +9,32 @@
 #include "mruby/string.h"
 #include <stdio.h>
 
+#ifdef BUILDTARGET
+void putConsole(const char*);
+#endif
+
 static void
 printstr(mrb_state *mrb, mrb_value obj)
 {
+#ifndef BUILDTARGET
   struct RString *str;
   char *s;
   int len;
 
-  if (mrb_type(obj) == MRB_TT_STRING) {
+  if (mrb_string_p(obj)) {
     str = mrb_str_ptr(obj);
     s = str->ptr;
     len = str->len;
     fwrite(s, len, 1, stdout);
   }
+#else
+  struct RString *str;
+  
+  if (mrb_string_p(obj)) {
+    str = mrb_str_ptr(obj);
+    putConsole(str->ptr);
+  }
+#endif
 }
 
 void
