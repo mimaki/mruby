@@ -6,6 +6,10 @@
 
 #include "mruby.h"
 
+  /* enzi class libraries */
+void mrb_init_digitalio(mrb_state *mrb);
+void mrb_init_analogio(mrb_state *mrb);
+
 void
 mrb_init_ext(mrb_state *mrb)
 {
@@ -13,4 +17,8 @@ mrb_init_ext(mrb_state *mrb)
   extern void mrb_init_socket(mrb_state *mrb);
   mrb_init_socket(mrb);
 #endif
+
+  /* enzi class libraries */
+  mrb_init_digitalio(mrb);
+  mrb_init_analogio(mrb);
 }

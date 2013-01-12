@@ -285,8 +285,3 @@ main(int argc, char **argv)
 
   return n == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
-void
-putConsole(const char *str)
-{
-}

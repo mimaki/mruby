@@ -225,8 +225,3 @@ void
 mrb_init_mrblib(mrb_state *mrb)
 {
 }
-
-void
-putConsole(const char *str)
-{
-}
