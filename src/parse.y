@@ -1749,7 +1749,7 @@ aref_args	: none
 		    }
 		| assocs trailer
 		    {
-		      $$ = new_hash(p, $1);
+		      $$ = cons(new_hash(p, $1), 0);
 		    }
 		;
 
@@ -3162,9 +3162,12 @@ skips(parser_state *p, const char *s)
       int len = strlen(s);
 
       while (len--) {
-	nextc(p);
+        nextc(p);
       }
       return TRUE;
+    }
+	else{
+      s--;
     }
   }
   return FALSE;
@@ -3329,7 +3332,7 @@ read_escape(parser_state *p)
 	  break;
 	}
       }
-      c = scan_hex(buf, i+1, &i);
+      c = scan_hex(buf, i, &i);
       if (i == 0) {
 	yyerror(p, "Invalid escape character syntax");
 	return 0;
@@ -4747,13 +4750,14 @@ mrb_parser_new(mrb_state *mrb)
 {
   mrb_pool *pool;
   parser_state *p;
+  static const parser_state parser_state_zero = { 0 };
 
   pool = mrb_pool_open(mrb);
   if (!pool) return 0;
   p = (parser_state *)mrb_pool_alloc(pool, sizeof(parser_state));
   if (!p) return 0;
 
-  memset(p, 0, sizeof(parser_state));
+  *p = parser_state_zero;
   p->mrb = mrb;
   p->pool = pool;
   p->in_def = p->in_single = 0;
@@ -4850,7 +4854,6 @@ load_exec(mrb_state *mrb, parser_state *p, mrbc_context *c)
   mrb_value v;
 
   if (!p) {
-    mrb_parser_free(p);
     return mrb_undef_value();
   }
   if (!p->tree || p->nerr) {
@@ -4867,7 +4870,7 @@ load_exec(mrb_state *mrb, parser_state *p, mrbc_context *c)
       static const char msg[] = "syntax error";
       mrb->exc = (struct RObject*)mrb_object(mrb_exc_new(mrb, E_SYNTAX_ERROR, msg, sizeof(msg) - 1));
       mrb_parser_free(p);
-      return mrb_nil_value();
+      return mrb_undef_value();
     }
   }
   n = mrb_generate_code(mrb, p);
