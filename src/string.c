@@ -1114,44 +1114,6 @@ mrb_str_downcase(mrb_state *mrb, mrb_value self)
   return str;
 }
 
-/* 15.2.10.5.15 */
-/*
- *  call-seq:
- *     str.each(separator=$/) {|substr| block }        => str
- *     str.each_line(separator=$/) {|substr| block }   => str
- *
- *  Splits <i>str</i> using the supplied parameter as the record separator
- *  (<code>$/</code> by default), passing each substring in turn to the supplied
- *  block. If a zero-length record separator is supplied, the string is split
- *  into paragraphs delimited by multiple successive newlines.
- *
- *     print "Example one\n"
- *     "hello\nworld".each {|s| p s}
- *     print "Example two\n"
- *     "hello\nworld".each('l') {|s| p s}
- *     print "Example three\n"
- *     "hello\n\n\nworld".each('') {|s| p s}
- *
- *  <em>produces:</em>
- *
- *     Example one
- *     "hello\n"
- *     "world"
- *     Example two
- *     "hel"
- *     "l"
- *     "o\nworl"
- *     "d"
- *     Example three
- *     "hello\n\n\n"
- *     "world"
- */
-static mrb_value
-mrb_str_each_line(mrb_state *mrb, mrb_value str)
-{
-  return mrb_nil_value();
-}
-
 /* 15.2.10.5.16 */
 /*
  *  call-seq:
@@ -2511,7 +2473,7 @@ mrb_cstr_to_inum(mrb_state *mrb, const char *str, int base, int badcheck)
     return mrb_fixnum_value(result);
   }
 bad:
-  mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalide string for number(%s)", str);
+  mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid string for number(%s)", str);
   /* not reached */
   return mrb_fixnum_value(0);
 }
@@ -2544,12 +2506,8 @@ mrb_str_to_inum(mrb_state *mrb, mrb_value str, int base, int badcheck)
   if (s) {
     len = RSTRING_LEN(str);
     if (s[len]) {    /* no sentinel somehow */
-      char *p = (char *)mrb_malloc(mrb, len+1);
-
-      //MEMCPY(p, s, char, len);
-      memcpy(p, s, len);
-      p[len] = '\0';
-      s = p;
+      struct RString *temp_str = str_new(mrb, s, len);
+      s = temp_str->ptr;
     }
   }
   return mrb_cstr_to_inum(mrb, s, base, badcheck);
@@ -2621,7 +2579,7 @@ mrb_cstr_to_dbl(mrb_state *mrb, const char * p, int badcheck)
   if (p == end) {
     if (badcheck) {
 bad:
-      mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalide string for float(%s)", p);
+      mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid string for float(%s)", p);
       /* not reached */
     }
     return d;
@@ -2681,11 +2639,8 @@ mrb_str_to_dbl(mrb_state *mrb, mrb_value str, int badcheck)
       mrb_raise(mrb, E_ARGUMENT_ERROR, "string for Float contains null byte");
     }
     if (s[len]) {    /* no sentinel somehow */
-      char *p = (char *)mrb_malloc(mrb, len+1);
-
-      memcpy(p, s, len);
-      p[len] = '\0';
-      s = p;
+      struct RString *temp_str = str_new(mrb, s, len);
+      s = temp_str->ptr;
     }
   }
   return mrb_cstr_to_dbl(mrb, s, badcheck);
@@ -3004,7 +2959,7 @@ mrb_str_bytes(mrb_state *mrb, mrb_value str)
 {
   struct RString *s = mrb_str_ptr(str);
   mrb_value a = mrb_ary_new_capa(mrb, s->len);
-  char *p = s->ptr, *pend = p + s->len;
+  unsigned char *p = (unsigned char *)(s->ptr), *pend = p + s->len;
 
   while (p < pend) {
     mrb_ary_push(mrb, a, mrb_fixnum_value(p[0]));
@@ -3040,7 +2995,6 @@ mrb_init_string(mrb_state *mrb)
   mrb_define_method(mrb, s, "chop!",           mrb_str_chop_bang,       ARGS_REQ(1));              /* 15.2.10.5.12 */
   mrb_define_method(mrb, s, "downcase",        mrb_str_downcase,        ARGS_NONE());              /* 15.2.10.5.13 */
   mrb_define_method(mrb, s, "downcase!",       mrb_str_downcase_bang,   ARGS_NONE());              /* 15.2.10.5.14 */
-  mrb_define_method(mrb, s, "each_line",       mrb_str_each_line,       ARGS_REQ(1));              /* 15.2.10.5.15 */
   mrb_define_method(mrb, s, "empty?",          mrb_str_empty_p,         ARGS_NONE());              /* 15.2.10.5.16 */
   mrb_define_method(mrb, s, "eql?",            mrb_str_eql,             ARGS_REQ(1));              /* 15.2.10.5.17 */
 #ifdef ENABLE_REGEXP

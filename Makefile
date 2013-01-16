@@ -1,118 +1,18 @@
-# Makefile description.
-# basic build file for mruby
+# mruby is using Rake (http://rake.rubyforge.org) as a build tool.
+# We provide a minimalistic version called minirake inside of our 
+# codebase.
 
-# compiler, linker (gcc), archiver, parser generator
-ifeq ($(strip $(BUILDTARGET)),arm)
-  TARGET_COMPILER = arm-linux-gnueabi-
-  export CC = $(TARGET_COMPILER)gcc
-  export LL = $(TARGET_COMPILER)gcc
-  export AR = $(TARGET_COMPILER)ar
-  export TARGET_MODULE = -arm
-  CFLAG0 = "-DBUILDTARGET"
-else ifeq ($(strip $(BUILDTARGET)),nacl32)
-  NACLSDK = ~/workspace/nacl_sdk
-  PEPPER = pepper_23
-  NACLTOOL = linux_x86_newlib
-  TARGET_COMPILER = $(NACLSDK)/$(PEPPER)/toolchain/$(NACLTOOL)/bin/x86_64-nacl-
-  export CC = $(TARGET_COMPILER)gcc -m32
-  export LL = $(TARGET_COMPILER)g++ -m32
-  export AR = $(TARGET_COMPILER)ar
-  export TARGET_MODULE = -nacl32
-  CFLAG0 = "-DBUILDTARGET"
-else ifeq ($(strip $(BUILDTARGET)),nacl64)
-  NACLSDK = ~/workspace/nacl_sdk
-  PEPPER = pepper_23
-  NACLTOOL = linux_x86_newlib
-  TARGET_COMPILER = $(NACLSDK)/$(PEPPER)/toolchain/$(NACLTOOL)/bin/x86_64-nacl-
-  export CC = $(TARGET_COMPILER)gcc -m64
-  export LL = $(TARGET_COMPILER)g++ -m64
-  export AR = $(TARGET_COMPILER)ar
-  export TARGET_MODULE = -nacl64
-  CFLAG0 = "-DBUILDTARGET"
-else
-  export CC = gcc
-  export LL = gcc
-  export AR = ar
-  export TARGET_MODULE =
-  CFLAG0 =
-endif
-export YACC = bison
-
-ifeq ($(strip $(COMPILE_MODE)),)
-  # default compile option
-  COMPILE_MODE = debug
-endif
-
-ifeq ($(COMPILE_MODE),debug)
-  CFLAGS = -g -O3
-else ifeq ($(COMPILE_MODE),release)
-  CFLAGS = -O3
-else ifeq ($(COMPILE_MODE),small)
-  CFLAGS = -Os
-endif
-
-ALL_CFLAGS = -Wall -Werror-implicit-function-declaration $(CFLAGS) $(CFLAG0)
-ifeq ($(OS),Windows_NT)
-  MAKE_FLAGS = --no-print-directory CC=$(CC) LL=$(LL) ALL_CFLAGS='$(ALL_CFLAGS)'
-else
-  MAKE_FLAGS = --no-print-directory CC='$(CC)' LL='$(LL)' ALL_CFLAGS='$(ALL_CFLAGS)'
-endif
-
-##############################
-# internal variables
-
-export MSG_BEGIN = @for line in
-export MSG_END = ; do echo "$$line"; done
-
-export CP := cp
-export RM_F := rm -f
-export CAT := cat
-
-##############################
-# generic build targets, rules
+RAKE = ruby ./minirake
 
 .PHONY : all
 all :
-	@$(MAKE) -C src $(MAKE_FLAGS)
-	@$(MAKE) -C mrblib $(MAKE_FLAGS)
-	@$(MAKE) -C tools/mruby $(MAKE_FLAGS)
-	@$(MAKE) -C tools/mirb $(MAKE_FLAGS)
+	$(RAKE)
 
-# mruby test
 .PHONY : test
 test : all
-	@$(MAKE) -C test $(MAKE_FLAGS)
+	$(RAKE) test
 
-# clean up
 .PHONY : clean
 clean :
-	@$(MAKE) clean -C src $(MAKE_FLAGS)
-	@$(MAKE) clean -C tools/mruby $(MAKE_FLAGS)
-	@$(MAKE) clean -C tools/mirb $(MAKE_FLAGS)
-	@$(MAKE) clean -C test $(MAKE_FLAGS)
+	$(RAKE) clean
 
-# display help for build configuration and interesting targets
-.PHONY : showconfig
-showconfig :
-	$(MSG_BEGIN) \
-	"" \
-	"  CC = $(CC)" \
-	"  LL = $(LL)" \
-	"  MAKE = $(MAKE)" \
-	"" \
-	"  CFLAGS = $(CFLAGS)" \
-	"  ALL_CFLAGS = $(ALL_CFLAGS)" \
-	$(MSG_END)
-
-.PHONY : help
-help :
-	$(MSG_BEGIN) \
-	"" \
-	"            Basic mruby Makefile" \
-	"" \
-	"targets:" \
-	"  all (default):  build all targets, install (locally) in-repo" \
-	"  clean:          clean all built and in-repo installed artifacts" \
-	"  showconfig:     show build config summary" \
-	"  test:           run all mruby tests" \
-	$(MSG_END)

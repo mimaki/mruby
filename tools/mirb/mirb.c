@@ -5,13 +5,17 @@
 ** an interactive way and executes it
 ** immediately. It's a REPL...
 */
- 
+
 #include <string.h>
 
 #include <mruby.h>
 #include <mruby/proc.h>
 #include <mruby/data.h>
 #include <mruby/compile.h>
+#ifdef ENABLE_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
 
 #ifndef ENABLE_STDIO
 #include <mruby/string.h>
@@ -143,10 +147,12 @@ print_cmdline(int code_block_open)
 int
 main(void)
 {
-  char last_char;
   char ruby_code[1024] = { 0 };
   char last_code_line[1024] = { 0 };
+#ifndef ENABLE_READLINE
+  int last_char;
   int char_index;
+#endif
   mrbc_context *cxt;
   struct mrb_parser_state *parser;
   mrb_state *mrb;
@@ -156,7 +162,7 @@ main(void)
 
   print_hint();
 
-  /* new interpreter instance */ 
+  /* new interpreter instance */
   mrb = mrb_open();
   if (mrb == NULL) {
     fprintf(stderr, "Invalid mrb interpreter, exiting mirb");
@@ -167,6 +173,7 @@ main(void)
   cxt->capture_errors = 1;
 
   while (TRUE) {
+#ifndef ENABLE_READLINE
     print_cmdline(code_block_open);
 
     char_index = 0;
@@ -180,6 +187,12 @@ main(void)
     }
 
     last_code_line[char_index] = '\0';
+#else
+    char* line = readline(code_block_open ? "* " : "> ");
+    strncat(last_code_line, line, sizeof(last_code_line)-1);
+    add_history(line);
+    free(line);
+#endif
 
     if ((strcmp(last_code_line, "quit") == 0) || (strcmp(last_code_line, "exit") == 0)) {
       if (!code_block_open) {
@@ -207,7 +220,7 @@ main(void)
     parser->send = ruby_code + strlen(ruby_code);
     parser->lineno = 1;
     mrb_parser_parse(parser, cxt);
-    code_block_open = is_code_block_open(parser); 
+    code_block_open = is_code_block_open(parser);
 
     if (code_block_open) {
       /* no evaluation of code */

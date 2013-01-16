@@ -29,8 +29,8 @@ mrb_hash_ht_hash_equal(mrb_state *mrb, mrb_value a, mrb_value b)
   return mrb_eql(mrb, a, b);
 }
 
-KHASH_DECLARE(ht, mrb_value, mrb_value, 1);
-KHASH_DEFINE (ht, mrb_value, mrb_value, 1, mrb_hash_ht_hash_func, mrb_hash_ht_hash_equal);
+KHASH_DECLARE(ht, mrb_value, mrb_value, 1)
+KHASH_DEFINE (ht, mrb_value, mrb_value, 1, mrb_hash_ht_hash_func, mrb_hash_ht_hash_equal)
 
 static void mrb_hash_modify(mrb_state *mrb, mrb_value hash);
 
@@ -185,6 +185,12 @@ static void
 mrb_hash_modify_check(mrb_state *mrb, mrb_value hash)
 {
   //if (OBJ_FROZEN(hash)) mrb_error_frozen("hash");
+}
+
+mrb_value
+mrb_check_hash_type(mrb_state *mrb, mrb_value hash)
+{
+  return mrb_check_convert_type(mrb, hash, MRB_TT_HASH, "Hash", "to_hash");
 }
 
 khash_t(ht) *

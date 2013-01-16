@@ -3075,7 +3075,7 @@ nextc(parser_state *p)
       return -1;
     }
     else {
-      c = *p->s++;
+      c = (unsigned char)*p->s++;
     }
     if (c == '\n') {
       // must understand heredoc
@@ -3307,7 +3307,8 @@ read_escape(parser_state *p)
        int buf[3];
        int i;
 
-       for (i=0; i<3; i++) {
+       buf[0] = c;
+       for (i=1; i<3; i++) {
 	 buf[i] = nextc(p);
 	 if (buf[i] == -1) goto eof;
 	 if (buf[i] < '0' || '7' < buf[i]) {
@@ -3315,7 +3316,7 @@ read_escape(parser_state *p)
 	   break;
 	 }
        }
-       c = scan_oct(buf, i+1, &i);
+       c = scan_oct(buf, i, &i);
     }
     return c;
 
