@@ -9,14 +9,14 @@
 #include "mruby/string.h"
 #include <stdio.h>
 
-#ifdef BUILDTARGET
+#ifdef NACL_ENABLED
 void putConsole(const char*);
 #endif
 
 static void
 printstr(mrb_state *mrb, mrb_value obj)
 {
-#ifndef BUILDTARGET
+#ifndef NACL_ENABLED
   struct RString *str;
   char *s;
   int len;
