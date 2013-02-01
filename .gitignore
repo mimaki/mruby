@@ -14,3 +14,4 @@ cscope.out
 /src/y.tab.c
 /bin
 /build
+/lib
