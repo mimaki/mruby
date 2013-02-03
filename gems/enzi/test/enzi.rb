@@ -127,3 +127,39 @@ assert('ENZI', 'PWMPIN') do
   PWMPIN[:PWM5] == PWM5
 end
 
+assert('ENZI.delay', 'few args') do
+  e = nil
+  begin
+    delay()
+  rescue => e
+  end
+  e
+end
+
+assert('ENZI.delay') do
+  delay(1)
+  true
+end
+
+assert('ENZI.millis') do
+  millis >= 0
+end
+
+assert('ENZI.sleep', 'few args') do
+  e = nil
+  begin
+    delay()
+  rescue => e
+  end
+  e
+end
+
+assert('ENZI.sleep') do
+  e = nil
+  begin
+    sleep(1)
+    sleep(0.001)
+  rescue => e
+  end
+  e == nil
+end

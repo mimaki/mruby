@@ -71,6 +71,45 @@ enzi_init_constants(mrb_state *mrb, struct RClass *enzi)
   mrb_mod_cv_set(mrb, enzi, INTERN("PWMPIN"), hash);
 }
 
+static mrb_value
+mrb_delay(mrb_state *mrb, mrb_value self)
+{
+  mrb_int ms;
+
+  mrb_get_args(mrb, "i", &ms);
+
+  // TODO: 
+#ifdef ENZI_BOARD
+#endif
+  return mrb_nil_value();
+}
+
+static mrb_value
+mrb_millis(mrb_state *mrb, mrb_value self)
+{
+  mrb_int ms = 0;
+
+  // TODO: 
+#ifdef ENZI_BOARD
+#endif
+  return mrb_fixnum_value(ms);
+}
+
+static mrb_value
+mrb_sleep(mrb_state *mrb, mrb_value self)
+{
+  mrb_float sec;
+  mrb_int ms;
+
+  mrb_get_args(mrb, "f", &sec);
+  ms = (mrb_int)(sec / 1000.0);
+
+  // TODO: 
+#ifdef ENZI_BOARD
+#endif
+  return mrb_nil_value();
+}
+
 void
 mrb_enzi_gem_init(mrb_state *mrb)
 {
@@ -81,6 +120,11 @@ mrb_enzi_gem_init(mrb_state *mrb)
 
   /* ENZI constants */
   enzi_init_constants(mrb, enzi);
+
+  /* ENZI methods */
+  mrb_define_method(mrb, enzi, "delay", mrb_delay, ARGS_REQ(1));
+  mrb_define_method(mrb, enzi, "millis", mrb_millis, ARGS_NONE());
+  mrb_define_method(mrb, enzi, "sleep", mrb_sleep, ARGS_REQ(1));
 
   /* initialize ENZI class libraries */
   mrb_init_digitalio(mrb, enzi);

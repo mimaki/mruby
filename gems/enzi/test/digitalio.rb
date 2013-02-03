@@ -6,3 +6,6 @@ assert('DigitalIO', 'superclass') do
   DigitalIO.superclass == Object
 end
 
+assert('DigitalIO', 'include?(ENZI)') do
+  DigitalIO.include?(ENZI)
+end
