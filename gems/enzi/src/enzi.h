@@ -7,7 +7,9 @@
 
 #define INTERN(name) mrb_intern(mrb, name)
 
-extern const int8_t _anapin[];
+void mrb_init_digitalio(mrb_state*, struct RClass*);
+void mrb_init_analogio(mrb_state*, struct RClass*);
+void mrb_init_watchdog(mrb_state*, struct RClass*);
 
 void enzi_const_set(mrb_state*, struct RClass*, mrb_value, mrb_sym, mrb_value);
 

@@ -8,11 +8,8 @@
 #include <stdio.h>
 #include "enzi.h"
 
-void mrb_init_digitalio(mrb_state*, struct RClass*);
-void mrb_init_analogio(mrb_state*, struct RClass*);
-
 /* PIN assign definition */
-const int8_t _anapin[] = {0, 1, 2, 3, 4, 5};
+static const int8_t _anapin[] = {0, 1, 2, 3, 4, 5};
 static const int8_t _digpin[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 1, 2, 3, 4, 5};
 static const int8_t _pwmpin[] = {3, 5, 6, 9, 10, 11};
 
@@ -158,6 +155,7 @@ mrb_enzi_gem_init(mrb_state *mrb)
   /* initialize ENZI class libraries */
   mrb_init_digitalio(mrb, enzi);
   mrb_init_analogio(mrb, enzi);
+  mrb_init_watchdog(mrb, enzi);
 
   mrb_include_module(mrb, mrb->object_class, enzi);
 }
