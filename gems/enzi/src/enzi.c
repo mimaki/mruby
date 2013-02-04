@@ -6,20 +6,17 @@
 */
 
 #include <stdio.h>
-#include "mruby.h"
-#include "mruby/variable.h"
-#include "mruby/hash.h"
 #include "enzi.h"
 
 void mrb_init_digitalio(mrb_state*, struct RClass*);
 void mrb_init_analogio(mrb_state*, struct RClass*);
 
 /* PIN assign definition */
-static const int8_t _anapin[] = {0, 1, 2, 3, 4, 5};
+const int8_t _anapin[] = {0, 1, 2, 3, 4, 5};
 static const int8_t _digpin[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 1, 2, 3, 4, 5};
 static const int8_t _pwmpin[] = {3, 5, 6, 9, 10, 11};
 
-static void
+void
 enzi_const_set(mrb_state *mrb, struct RClass *enzi, mrb_value hash, mrb_sym sym, mrb_value v)
 {
   mrb_mod_cv_set(mrb, enzi, sym, v);
@@ -38,6 +35,8 @@ enzi_init_constants(mrb_state *mrb, struct RClass *enzi)
   enzi_const_set(mrb, enzi, hash, INTERN("LOW"), mrb_fixnum_value(0));
   enzi_const_set(mrb, enzi, hash, INTERN("HIGH"), mrb_fixnum_value(1));
   mrb_mod_cv_set(mrb, enzi, INTERN("LEVEL"), hash);
+//printf("LEVEL=");
+//mrb_p(mrb, hash);
 
   /* IOMODE */
   hash = mrb_hash_new_capa(mrb, 3);
@@ -45,6 +44,8 @@ enzi_init_constants(mrb_state *mrb, struct RClass *enzi)
   enzi_const_set(mrb, enzi, hash, INTERN("OUTPUT"), mrb_fixnum_value(1));
   enzi_const_set(mrb, enzi, hash, INTERN("INPUT_PULLUP"), mrb_fixnum_value(2));
   mrb_mod_cv_set(mrb, enzi, INTERN("IOMODE"), hash);
+//printf("IOMODE=");
+//mrb_p(mrb, hash);
 
   /* AIPIN */
   hash = mrb_hash_new_capa(mrb, sizeof(_anapin));
@@ -53,6 +54,8 @@ enzi_init_constants(mrb_state *mrb, struct RClass *enzi)
     enzi_const_set(mrb, enzi, hash, INTERN(name), mrb_fixnum_value(_anapin[i]));
   }
   mrb_mod_cv_set(mrb, enzi, INTERN("AIPIN"), hash);
+//printf("AIPIN=");
+//mrb_p(mrb, hash);
 
   /* DIOPIN */
   hash = mrb_hash_new_capa(mrb, sizeof(_digpin) + 1);
@@ -62,6 +65,8 @@ enzi_init_constants(mrb_state *mrb, struct RClass *enzi)
   }
   enzi_const_set(mrb, enzi, hash, INTERN("DLED"), mrb_fixnum_value(14));
   mrb_mod_cv_set(mrb, enzi, INTERN("DIOPIN"), hash);
+//printf("DIOPIN=");
+//mrb_p(mrb, hash);
 
   /* PWMPIN */
   for (i = 0; i < sizeof(_pwmpin); i++) {
@@ -69,6 +74,30 @@ enzi_init_constants(mrb_state *mrb, struct RClass *enzi)
     enzi_const_set(mrb, enzi, hash, INTERN(name), mrb_fixnum_value(_pwmpin[i]));
   }
   mrb_mod_cv_set(mrb, enzi, INTERN("PWMPIN"), hash);
+//printf("PWMPIN=");
+//mrb_p(mrb, hash);
+}
+
+mrb_value
+enzi_get_iomode(mrb_state *mrb, struct RClass *c, mrb_value mode)
+{
+  mrb_value hash, v;
+
+  if (mrb_fixnum_p(mode)) {
+    return mode;
+  }
+
+  if (!mrb_symbol_p(mode)) {
+    mrb_raise(mrb, E_TYPE_ERROR, "illegal mode");
+  }
+
+  hash = mrb_mod_cv_get(mrb, c, INTERN("IOMODE"));
+  v = mrb_hash_get(mrb, hash, mode);
+  if (mrb_nil_p(v)) {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "illegal mode: %s", mrb_sym2name(mrb, mrb_symbol(mode)));
+  }
+
+  return v;
 }
 
 static mrb_value

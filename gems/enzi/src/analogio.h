@@ -1,0 +1,10 @@
+#ifndef ANALOGIO_H
+#define ANALOGIO_H
+
+#define ENZI_AIO_REF_DEFAULT  0
+#define ENZI_AIO_REF_INTERNAL 1
+#define ENZI_AIO_REF_EXTERNAL 2
+
+#define ENZI_AIO_RES_DEFAULT  8
+
+#endif /* ANALOGIO_H */
