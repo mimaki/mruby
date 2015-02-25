@@ -102,6 +102,7 @@ MRuby::Build.new('host-debug') do |conf|
   conf.cc.defines = %w(ENABLE_DEBUG)
 
   # Generate mruby debugger command (require mruby-eval)
+  conf.gem :core => "mruby-eval"
   conf.gem :core => "mruby-bin-debugger"
 
   # bintest
@@ -122,3 +123,14 @@ end
 #   conf.test_runner.command = 'env'
 #
 # end
+
+# Difine arm-none-eabi build settings
+MRuby::CrossBuild.new('arm-ev3') do |conf|
+  toolchain :gccarm
+
+  conf.build_mrbtest_lib_only
+
+  conf.gembox 'arm-ev3'
+
+  conf.bins = %w()
+end
