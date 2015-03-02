@@ -132,5 +132,7 @@ MRuby::CrossBuild.new('arm-ev3') do |conf|
 
   conf.gembox 'arm-ev3'
 
+  conf.cc.defines = %w(EV3)
+
   conf.bins = %w()
 end
