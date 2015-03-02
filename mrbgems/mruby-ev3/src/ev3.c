@@ -38,6 +38,8 @@ typedef enum {
 } ledcolor_t;
 
 /* EV3 API wrapper functions */
+/* RTOS */
+int32_t EV3_delay(int32_t);
 /* LCD */
 int32_t EV3_lcd_set_font(int16_t);
 int32_t EV3_font_get_size(int16_t, int32_t*, int32_t*);
@@ -63,6 +65,24 @@ typedef struct ev3_font_size {
 } ev3_font_size;
 
 static ev3_font_size _font_size[2] = {{0, 8}, {0, 16}};
+
+/*
+ *  call-seq:
+ *     delay(100)
+ *
+ *  Returns nil.
+ */
+static mrb_value
+rtos_delay(mrb_state *mrb, mrb_value self)
+{
+  mrb_int t;
+
+  mrb_get_args(mrb, "i", &t);
+
+  EV3_delay(t);
+
+  return mrb_nil_value();
+}
 
 /*
  *  call-seq:
@@ -392,6 +412,9 @@ mrb_mruby_ev3_gem_init(mrb_state *mrb)
 
   /* EV3 module */
   ev3 = mrb_define_module(mrb, "EV3");
+
+  /* RTOS api */
+  mrb_define_method(mrb, ev3, "delay", rtos_delay, MRB_ARGS_REQ(1));
 
   /* LCD class */
   lcd = mrb_define_class_under(mrb, ev3, "LCD", mrb->object_class);

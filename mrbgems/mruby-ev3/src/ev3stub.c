@@ -3,6 +3,12 @@
 
 #ifndef EV3
 int32_t
+EV3_delay(int32_t tmo)
+{
+  return 0;
+}
+
+int32_t
 EV3_lcd_set_font(int16_t font)
 {
   return 0;
