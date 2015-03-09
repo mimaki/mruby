@@ -1,0 +1,128 @@
+#ifndef _EV3IF_H
+#define _EV3IF_H
+
+#define EV3_LCD_WIDTH   178
+#define EV3_LCD_HEIGHT  128
+
+#define EV3_FONT_SMALL  0   /*  6x 8 pixels */
+#define EV3_FONT_MEDIUM 1   /* 10x16 pixels */
+
+#define EV3_LCD_WHITE   0
+#define EV3_LCD_BLACK   1
+
+#define EV3_MOTOR_FMAX  (100)
+#define EV3_MOTOR_BMAX  (-100)
+
+#define NOTE_C4  (261.63)  //!< \~English Frequency of musical note C4  \~Japanese ノートC4の周波数
+#define NOTE_CS4 (277.18)  //!< \~English Frequency of musical note C#4 \~Japanese ノートC#4の周波数
+#define NOTE_D4  (293.66)  //!< \~English Frequency of musical note D4  \~Japanese ノートD4の周波数
+#define NOTE_DS4 (311.13)  //!< \~English Frequency of musical note D#4 \~Japanese ノートD#4の周波数
+#define NOTE_E4  (329.63)  //!< \~English Frequency of musical note E4  \~Japanese ノートE4の周波数
+#define NOTE_F4  (349.23)  //!< \~English Frequency of musical note F4  \~Japanese ノートF4の周波数
+#define NOTE_FS4 (369.99)  //!< \~English Frequency of musical note F#4 \~Japanese ノートF#4の周波数
+#define NOTE_G4  (392.00)  //!< \~English Frequency of musical note G4  \~Japanese ノートG4の周波数
+#define NOTE_GS4 (415.30)  //!< \~English Frequency of musical note G#4 \~Japanese ノートG#4の周波数
+#define NOTE_A4  (440.00)  //!< \~English Frequency of musical note A4  \~Japanese ノートA4の周波数
+#define NOTE_AS4 (466.16)  //!< \~English Frequency of musical note A#4 \~Japanese ノートA#4の周波数
+#define NOTE_B4  (493.88)  //!< \~English Frequency of musical note B4  \~Japanese ノートB4の周波数
+#define NOTE_C5  (523.25)  //!< \~English Frequency of musical note C5  \~Japanese ノートC5の周波数
+#define NOTE_CS5 (554.37)  //!< \~English Frequency of musical note C#5 \~Japanese ノートC#5の周波数
+#define NOTE_D5  (587.33)  //!< \~English Frequency of musical note D5  \~Japanese ノートD5の周波数
+#define NOTE_DS5 (622.25)  //!< \~English Frequency of musical note D#5 \~Japanese ノートD#5の周波数
+#define NOTE_E5  (659.25)  //!< \~English Frequency of musical note E5  \~Japanese ノートE5の周波数
+#define NOTE_F5  (698.46)  //!< \~English Frequency of musical note F5  \~Japanese ノートF5の周波数
+#define NOTE_FS5 (739.99)  //!< \~English Frequency of musical note F#5 \~Japanese ノートF#5の周波数
+#define NOTE_G5  (783.99)  //!< \~English Frequency of musical note G5  \~Japanese ノートG5の周波数
+#define NOTE_GS5 (830.61)  //!< \~English Frequency of musical note G#5 \~Japanese ノートG#5の周波数
+#define NOTE_A5  (880.00)  //!< \~English Frequency of musical note A5  \~Japanese ノートA5の周波数
+#define NOTE_AS5 (932.33)  //!< \~English Frequency of musical note A#5 \~Japanese ノートA#5の周波数
+#define NOTE_B5  (987.77)  //!< \~English Frequency of musical note B5  \~Japanese ノートB5の周波数
+#define NOTE_C6  (1046.50) //!< \~English Frequency of musical note C6  \~Japanese ノートC6の周波数
+#define NOTE_CS6 (1108.73) //!< \~English Frequency of musical note C#6 \~Japanese ノートC#6の周波数
+#define NOTE_D6  (1174.66) //!< \~English Frequency of musical note D6  \~Japanese ノートD6の周波数
+#define NOTE_DS6 (1244.51) //!< \~English Frequency of musical note D#6 \~Japanese ノートD#6の周波数
+#define NOTE_E6  (1318.51) //!< \~English Frequency of musical note E6  \~Japanese ノートE6の周波数
+#define NOTE_F6  (1396.91) //!< \~English Frequency of musical note F6  \~Japanese ノートF6の周波数
+#define NOTE_FS6 (1479.98) //!< \~English Frequency of musical note F#6 \~Japanese ノートF#6の周波数
+#define NOTE_G6  (1567.98) //!< \~English Frequency of musical note G6  \~Japanese ノートG6の周波数
+#define NOTE_GS6 (1661.22) //!< \~English Frequency of musical note G#6 \~Japanese ノートG#6の周波数
+#define NOTE_A6  (1760.00) //!< \~English Frequency of musical note A6  \~Japanese ノートA6の周波数
+#define NOTE_AS6 (1864.66) //!< \~English Frequency of musical note A#6 \~Japanese ノートA#6の周波数
+#define NOTE_B6  (1975.53) //!< \~English Frequency of musical note B6  \~Japanese ノートB6の周波数
+#define NOTE_C6  (1046.50) //!< \~English Frequency of musical note C6  \~Japanese ノートC6の周波数
+#define NOTE_CS6 (1108.73) //!< \~English Frequency of musical note C#6 \~Japanese ノートC#6の周波数
+#define NOTE_D6  (1174.66) //!< \~English Frequency of musical note D6  \~Japanese ノートD6の周波数
+#define NOTE_DS6 (1244.51) //!< \~English Frequency of musical note D#6 \~Japanese ノートD#6の周波数
+#define NOTE_E6  (1318.51) //!< \~English Frequency of musical note E6  \~Japanese ノートE6の周波数
+#define NOTE_F6  (1396.91) //!< \~English Frequency of musical note F6  \~Japanese ノートF6の周波数
+#define NOTE_FS6 (1479.98) //!< \~English Frequency of musical note F#6 \~Japanese ノートF#6の周波数
+#define NOTE_G6  (1567.98) //!< \~English Frequency of musical note G6  \~Japanese ノートG6の周波数
+#define NOTE_GS6 (1661.22) //!< \~English Frequency of musical note G#6 \~Japanese ノートG#6の周波数
+#define NOTE_A6  (1760.00) //!< \~English Frequency of musical note A6  \~Japanese ノートA6の周波数
+#define NOTE_AS6 (1864.66) //!< \~English Frequency of musical note A#6 \~Japanese ノートA#6の周波数
+#define NOTE_B6  (1975.53) //!< \~English Frequency of musical note B6  \~Japanese ノートB6の周波数
+
+typedef void (*ISR)(intptr_t);
+
+typedef enum {
+    LEFT_BUTTON  = 0, //!< \~English Left button       \~Japanese 左ボタン
+    RIGHT_BUTTON = 1, //!< \~English Right button    \~Japanese 右ボタン
+    UP_BUTTON    = 2, //!< \~English Up button         \~Japanese 上ボタン
+    DOWN_BUTTON  = 3, //!< \~English Down button       \~Japanese 下ボタン
+    ENTER_BUTTON = 4, //!< \~English Enter button      \~Japanese 中央ボタン
+    BACK_BUTTON  = 5, //!< \~English Back button       \~Japanese 戻るボタン
+    TNUM_BUTTON  = 6, //!< \~English Number of buttons \~Japanese ボタンの数
+} button_t;
+
+typedef enum {
+  LED_OFF    = 0,           //!< \~English Turn off \~Japanese オフにする
+  LED_RED    = 1 << 0,        //!< \~English Red      \~Japanese 赤
+  LED_GREEN  = 1 << 1,        //!< \~English Green    \~Japanese 緑
+  LED_ORANGE = LED_RED | LED_GREEN, //!< \~English Orange   \~Japanese オレンジ色
+} ledcolor_t;
+
+typedef enum {
+  EV3_PORT_A = 0,   //!< \~English Port A        \~Japanese ポートA
+  EV3_PORT_B = 1,   //!< \~English Port B          \~Japanese ポートB
+  EV3_PORT_C = 2,   //!< \~English Port C          \~Japanese ポートC
+  EV3_PORT_D = 3,   //!< \~English Port D            \~Japanese ポートD
+  TNUM_MOTOR_PORT = 4 //!< \~English Number of motor ports \~Japanese モータポートの数
+} motor_port_t;
+
+typedef enum {
+  NONE_MOTOR = 0,    //!< \~English Not connected         \~Japanese モータ未接続
+  MEDIUM_MOTOR,    //!< \~English Medium servo motor    \~Japanese サーボモータM
+  LARGE_MOTOR,     //!< \~English Large servo motor     \~Japanese サーボモータL
+  UNREGULATED_MOTOR, //!< \~English Unregulated motor     \~Japanese 未調整モータ
+  TNUM_MOTOR_TYPE    //!< \~English Number of motor types \~Japanese モータタイプの数
+} motor_type_t;/* EV3 API wrapper functions */
+
+/* RTOS */
+int32_t EV3_delay(int32_t);
+/* LCD */
+int32_t EV3_lcd_set_font(int32_t);
+int32_t EV3_font_get_size(int32_t, int32_t*, int32_t*);
+int32_t EV3_lcd_draw_string(const char*, int32_t, int32_t);
+int32_t EV3_lcd_fill_rect(int32_t, int32_t, int32_t, int32_t, int32_t);
+/* Button */
+int32_t EV3_button_is_pressed(int32_t);
+int32_t EV3_button_set_on_clicked(int32_t, ISR, intptr_t);
+/* Battery */
+int EV3_battery_current_mA(void);
+int EV3_battery_voltage_mV(void);
+/* LED */
+int32_t EV3_led_set_color(int32_t);
+/* Sound */
+int32_t EV3_speaker_play_tone(uint16_t, int32_t);
+int32_t EV3_speaker_set_volume(uint8_t);
+int32_t EV3_speaker_stop(void);
+/* Motor */
+int32_t EV3_motor_set_power(int32_t, int32_t);
+int32_t EV3_motor_get_power(int32_t);
+int32_t EV3_motor_stop(int32_t, int32_t);
+int32_t EV3_motor_rotate(int32_t, int32_t, int32_t, int32_t);
+int32_t EV3_motor_get_count(int32_t);
+int32_t EV3_motor_reset_count(int32_t);
+
+
+#endif /* _EV3IF_H */

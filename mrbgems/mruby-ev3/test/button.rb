@@ -39,5 +39,10 @@ assert('Button', '[]') do
 end
 
 assert('Button', 'pressed?') do
-  Button[:left].pressed? == false
+  Button[:left].pressed?  == false &&
+  Button[:right].pressed? == false &&
+  Button[:up].pressed?    == false &&
+  Button[:down].pressed?  == false &&
+  Button[:enter].pressed? == false &&
+  Button[:back].pressed?  == false
 end

@@ -1,7 +1,15 @@
 #include <stdio.h>
 #include <stdint.h>
+#include "ev3if.h"
 
 #ifndef EV3
+typedef struct ev3_motor {
+  int32_t power;
+  int32_t count;
+} ev3_motor;
+
+static ev3_motor gMotor[4];
+
 int32_t
 EV3_delay(int32_t tmo)
 {
@@ -9,13 +17,13 @@ EV3_delay(int32_t tmo)
 }
 
 int32_t
-EV3_lcd_set_font(int16_t font)
+EV3_lcd_set_font(int32_t font)
 {
   return 0;
 }
 
 int32_t
-EV3_font_get_size(int16_t font, int32_t *pwidth, int32_t *pheight)
+EV3_font_get_size(int32_t font, int32_t *pwidth, int32_t *pheight)
 {
   switch(font) {
   case 0:
@@ -33,15 +41,112 @@ EV3_font_get_size(int16_t font, int32_t *pwidth, int32_t *pheight)
 }
 
 int32_t
-EV3_lcd_draw_string(const char *buf, uint32_t x, uint32_t y)
+EV3_lcd_draw_string(const char *buf, int32_t x, int32_t y)
 {
   printf("%s", buf);
   return 0;
 }
 
 int32_t
-EV3_button_is_pressed(int16_t key)
+EV3_lcd_fill_rect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t color)
 {
   return 0;
 }
+
+int32_t
+EV3_button_is_pressed(int32_t key)
+{
+  return 0;
+}
+
+int32_t
+EV3_led_set_color(int32_t col)
+{
+  return 0;
+}
+
+
+int32_t
+EV3_motor_set_power(int32_t port, int32_t speed)
+{
+  if (port < 0 && port >= TNUM_MOTOR_PORT) {
+    return 0;
+  }
+  gMotor[port].power  = (speed > EV3_MOTOR_FMAX) ? EV3_MOTOR_FMAX
+                      : (speed < EV3_MOTOR_BMAX) ? EV3_MOTOR_BMAX : speed;
+  return gMotor[port].power;
+}
+
+int32_t
+EV3_motor_get_power(int32_t port)
+{
+  if (port < 0 && port >= TNUM_MOTOR_PORT) {
+    return 0;
+  }
+  return gMotor[port].power;
+}
+
+int32_t
+EV3_motor_stop(int32_t port, int32_t brake)
+{
+  if (port < 0 && port >= TNUM_MOTOR_PORT) {
+    return -1;
+  }
+  return 0;
+}
+
+int32_t
+EV3_motor_rotate(int32_t port, int32_t deg, int32_t spd, int32_t blk)
+{
+  if (port < 0 && port >= TNUM_MOTOR_PORT) {
+    return -1;
+  }
+  gMotor[port].count = deg;
+  return 0;
+}
+
+int32_t
+EV3_motor_get_count(int32_t port)
+{
+  if (port < 0 && port >= TNUM_MOTOR_PORT) {
+    return 0;
+  }
+  return gMotor[port].count;
+}
+
+int32_t
+EV3_motor_reset_count(int32_t port)
+{
+  if (port < 0 && port >= TNUM_MOTOR_PORT) {
+    return -1;
+  }
+  gMotor[port].count = 0;
+  return 0;
+}
+
+int EV3_battery_current_mA(void)
+{
+  return 100;
+}
+
+int EV3_battery_voltage_mV(void)
+{
+  return 8900;
+}
+
+int32_t EV3_speaker_play_tone(uint16_t freq, int32_t ms)
+{
+  return 0;
+}
+
+int32_t EV3_speaker_set_volume(uint8_t vol)
+{
+  return 0;
+}
+
+int32_t EV3_speaker_stop(void)
+{
+  return 0;
+}
+
 #endif
