@@ -62,6 +62,15 @@
 #define NOTE_AS6 (1864.66) //!< \~English Frequency of musical note A#6 \~Japanese ノートA#6の周波数
 #define NOTE_B6  (1975.53) //!< \~English Frequency of musical note B6  \~Japanese ノートB6の周波数
 
+// #define MRUBY_EV3_DEBUG
+#ifdef MRUBY_EV3_DEBUG
+  #define MRBEV3_PRINTF(fmt, ...) printf(fmt, __VA_ARGS__)
+  #define MRBEV3_PUTS(x) puts(x)
+#else
+  #define MRBEV3_PRINTF(...)
+  #define MRBEV3_PUTS(x)
+#endif
+
 typedef void (*ISR)(intptr_t);
 
 typedef enum {
@@ -97,8 +106,35 @@ typedef enum {
   TNUM_MOTOR_TYPE    //!< \~English Number of motor types \~Japanese モータタイプの数
 } motor_type_t;/* EV3 API wrapper functions */
 
-/* RTOS */
-int32_t EV3_delay(int32_t);
+typedef enum {
+    EV3_PORT_1 = 0,     //!< \~English Port 1           \~Japanese ポート1
+    EV3_PORT_2 = 1,       //!< \~English Port 2               \~Japanese ポート2
+    EV3_PORT_3 = 2,     //!< \~English Port 3             \~Japanese ポート3
+    EV3_PORT_4 = 3,       //!< \~English Port 4           \~Japanese ポート4
+    TNUM_SENSOR_PORT = 4, //!< \~English Number of sensor ports \~Japanese センサポートの数
+} sensor_port_t;
+
+typedef enum {
+    NONE_SENSOR = 0,   //!< \~English Not connected      \~Japanese センサ未接続
+    ULTRASONIC_SENSOR, //!< \~English Ultrasonic sensor    \~Japanese 超音波センサ
+    GYRO_SENSOR,     //!< \~English Gyroscope sensor     \~Japanese ジャイロセンサ
+    TOUCH_SENSOR,    //!< \~English Touch sensor       \~Japanese タッチセンサ
+    COLOR_SENSOR,    //!< \~English Color sensor       \~Japanese カラーセンサ
+    TNUM_SENSOR_TYPE   //!< \~English Number of sensor types \~Japanese センサタイプの数
+} sensor_type_t;
+
+typedef enum {
+    COLOR_NONE   = 0, //!< \~English None         \~Japanese 無色
+    COLOR_BLACK  = 1, //!< \~English Black        \~Japanese 黒
+    COLOR_BLUE   = 2, //!< \~English Blue         \~Japanese 青
+    COLOR_GREEN  = 3, //!< \~English Green        \~Japanese 緑
+    COLOR_YELLOW = 4, //!< \~English Yellow       \~Japanese 黄
+    COLOR_RED    = 5, //!< \~English Red          \~Japanese 赤
+    COLOR_WHITE  = 6, //!< \~English White          \~Japanese 白
+    COLOR_BROWN  = 7, //!< \~English Brown        \~Japanese 茶
+    TNUM_COLOR      //!< \~English Number of colors \~Japanese 識別できるカラーの数
+} colorid_t;
+
 /* LCD */
 int32_t EV3_lcd_set_font(int32_t);
 int32_t EV3_font_get_size(int32_t, int32_t*, int32_t*);
@@ -117,12 +153,22 @@ int32_t EV3_speaker_play_tone(uint16_t, int32_t);
 int32_t EV3_speaker_set_volume(uint8_t);
 int32_t EV3_speaker_stop(void);
 /* Motor */
+int32_t EV3_motor_config(int32_t, int32_t);
 int32_t EV3_motor_set_power(int32_t, int32_t);
 int32_t EV3_motor_get_power(int32_t);
 int32_t EV3_motor_stop(int32_t, int32_t);
 int32_t EV3_motor_rotate(int32_t, int32_t, int32_t, int32_t);
 int32_t EV3_motor_get_count(int32_t);
 int32_t EV3_motor_reset_count(int32_t);
-
+/* Sensor */
+int32_t EV3_color_sensor_get_ambient(int32_t);
+int32_t EV3_color_sensor_get_color(int32_t);
+int32_t EV3_color_sensor_get_reflect(int32_t);
+int32_t EV3_gyro_sensor_get_angle(int32_t);
+int32_t EV3_gyro_sensor_get_rate(int32_t);
+int32_t EV3_gyro_sensor_reset(int32_t);
+int32_t EV3_touch_sensor_is_pressed(int32_t);
+int32_t EV3_ultrasonic_sensor_get_distance(int32_t);
+int32_t EV3_ultrasonic_sensor_listen(int32_t);
 
 #endif /* _EV3IF_H */
