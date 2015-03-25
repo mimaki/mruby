@@ -12,30 +12,32 @@ assert('Sensor', 'superclass') do
   Sensor.superclass == Device
 end
 
-assert('Sensor', 'constants') do
-  Sensor::PORT_1      == 0 &&
-  Sensor::PORT_2      == 1 &&
-  Sensor::PORT_3      == 2 &&
-  Sensor::PORT_4      == 3 &&
-  Sensor::NONE        == 0 &&
-  Sensor::ULTRASONIC  == 1 &&
-  Sensor::GYRO        == 2 &&
-  Sensor::TOUCH       == 3 &&
-  Sensor::COLOR       == 4
+assert('Sensor', 'PORT') do
+  Sensor::PORT[:port_1] == 0 &&
+  Sensor::PORT[:port_2] == 1 &&
+  Sensor::PORT[:port_3] == 2 &&
+  Sensor::PORT[:port_4] == 3
+end
+
+assert('Sensor', 'TYPE') do
+  Sensor::TYPE[:ultrasonic] == 1 &&
+  Sensor::TYPE[:gyro]       == 2 &&
+  Sensor::TYPE[:touch]      == 3 &&
+  Sensor::TYPE[:color]      == 4
 end
 
 assert('Sensor', 'port') do
-  ColorSensor.new(Sensor::PORT_1).port      == Sensor::PORT_1 &&
-  GyroSensor.new(Sensor::PORT_2).port       == Sensor::PORT_2 &&
-  TouchSensor.new(Sensor::PORT_3).port      == Sensor::PORT_3 &&
-  UltrasonicSensor.new(Sensor::PORT_4).port == Sensor::PORT_4
+  ColorSensor.new(:port_1).port       == Sensor::PORT[:port_1] &&
+  GyroSensor.new("port_2").port       == Sensor::PORT[:port_2] &&
+  TouchSensor.new(:port_3).port       == Sensor::PORT[:port_3] &&
+  UltrasonicSensor.new("port_4").port == Sensor::PORT[:port_4]
 end
 
 assert('Sensor', 'type') do
-  ColorSensor.new(Sensor::PORT_1).type      == Sensor::COLOR &&
-  GyroSensor.new(Sensor::PORT_2).type       == Sensor::GYRO &&
-  TouchSensor.new(Sensor::PORT_3).type      == Sensor::TOUCH &&
-  UltrasonicSensor.new(Sensor::PORT_4).type == Sensor::ULTRASONIC
+  ColorSensor.new(:port_1).type      == Sensor::TYPE[:color] &&
+  GyroSensor.new(:port_2).type       == Sensor::TYPE[:gyro] &&
+  TouchSensor.new(:port_3).type      == Sensor::TYPE[:touch] &&
+  UltrasonicSensor.new(:port_4).type == Sensor::TYPE[:ultrasonic]
 end
 
 
@@ -44,65 +46,65 @@ end
 #
 
 assert('ColorSensor', 'new') do
-  sen = ColorSensor.new(Sensor::PORT_1)
+  sen = ColorSensor.new(:port_1)
   sen &&
   sen.class.superclass == EV3::Sensor
-  sen.instance_variable_get("@port") == Sensor::PORT_1 &&
-  sen.instance_variable_get("@type") == Sensor::COLOR
+  sen.instance_variable_get("@port") == Sensor::PORT[:port_1] &&
+  sen.instance_variable_get("@type") == Sensor::TYPE[:color]
 end
 
-assert('ColorSensor', 'constants') do
-  ColorSensor::NONE   == 0 &&
-  ColorSensor::BLACK  == 1 &&
-  ColorSensor::BLUE   == 2 &&
-  ColorSensor::GREEN  == 3 &&
-  ColorSensor::YELLOW == 4 &&
-  ColorSensor::RED    == 5 &&
-  ColorSensor::WHITE  == 6 &&
-  ColorSensor::BROWN  == 7
+assert('ColorSensor', 'COLOR') do
+  ColorSensor::COLOR[:none]   == 0 &&
+  ColorSensor::COLOR[:black]  == 1 &&
+  ColorSensor::COLOR[:blue]   == 2 &&
+  ColorSensor::COLOR[:green]  == 3 &&
+  ColorSensor::COLOR[:yellow] == 4 &&
+  ColorSensor::COLOR[:red]    == 5 &&
+  ColorSensor::COLOR[:white]  == 6 &&
+  ColorSensor::COLOR[:brown]  == 7
 end
 
 assert('ColorSensor', 'ambient') do
-  sen = ColorSensor.new(Sensor::PORT_2)
+  sen = ColorSensor.new(:port_2)
   sen.ambient
 end
 
 assert('ColorSensor', 'color') do
-  sen = ColorSensor.new(Sensor::PORT_3)
+  sen = ColorSensor.new(:port_3)
   sen.color
 end
 
 assert('ColorSensor', 'reflect') do
-  sen = ColorSensor.new(Sensor::PORT_4)
+  sen = ColorSensor.new(:port_4)
   sen.reflect
 end
 
 assert('ColorSensor', 'black?') do
-  ColorSensor.new(Sensor::PORT_1).black? == false
+  ColorSensor.new(:port_1).black? == false
 end
 
 assert('ColorSensor', 'blue?') do
-  ColorSensor.new(Sensor::PORT_1).blue? == false
+  ColorSensor.new(:port_1).blue? == false
 end
 
 assert('ColorSensor', 'green?') do
-  ColorSensor.new(Sensor::PORT_1).green? == false
+  ColorSensor.new(:port_1).green? == false
 end
 
 assert('ColorSensor', 'yellow?') do
-  ColorSensor.new(Sensor::PORT_1).yellow? == false
+  ColorSensor.new(:port_1).yellow? == false
 end
 
 assert('ColorSensor', 'red?') do
-  ColorSensor.new(Sensor::PORT_1).red? == false
+  ColorSensor.new(:port_1).red? == false
 end
 
 assert('ColorSensor', 'white?') do
-  ColorSensor.new(Sensor::PORT_1).white? == false
+  ColorSensor.new(:port_1).white? == false
 end
 
 assert('ColorSensor', 'brown?') do
-  ColorSensor.new(Sensor::PORT_1).brown? == false
+  ColorSensor.new(:port_1).brown? == false
 end
 
 #
@@ -110,35 +112,35 @@ end
 #
 
 assert('GyroSensor', 'new') do
-  sen = GyroSensor.new(Sensor::PORT_1)
+  sen = GyroSensor.new(:port_1)
   sen &&
   sen.class.superclass == EV3::Sensor
-  sen.instance_variable_get("@port") == Sensor::PORT_1 &&
-  sen.instance_variable_get("@type") == Sensor::GYRO
+  sen.instance_variable_get("@port") == Sensor::PORT[:port_1] &&
+  sen.instance_variable_get("@type") == Sensor::TYPE[:gyro]
 end
 
 assert('GyroSensor', 'angle') do
-  sen = GyroSensor.new(Sensor::PORT_2)
+  sen = GyroSensor.new(:port_2)
   sen.angle
 end
 
 assert('GyroSensor', 'rate') do
-  sen = GyroSensor.new(Sensor::PORT_3)
+  sen = GyroSensor.new(:port_3)
   sen.rate
 end
 
 assert('GyroSensor', 'reset') do
-  sen = GyroSensor.new(Sensor::PORT_4)
+  sen = GyroSensor.new(:port_4)
   sen.reset == nil
 end
 
 assert('GyroSensor', 'calibrate') do
-  sen = GyroSensor.new(Sensor::PORT_1)
+  sen = GyroSensor.new(:port_1)
   sen.calibrate == nil
 end
 
 assert('GyroSensor', 'offset') do
-  sen = GyroSensor.new(Sensor::PORT_2)
+  sen = GyroSensor.new(:port_2)
   sen.offset
 end
 
@@ -148,15 +150,15 @@ end
 #
 
 assert('TouchSensor', 'new') do
-  sen = TouchSensor.new(Sensor::PORT_1)
+  sen = TouchSensor.new(:port_1)
   sen &&
   sen.class.superclass == EV3::Sensor
-  sen.instance_variable_get("@port") == Sensor::PORT_1 &&
-  sen.instance_variable_get("@type") == Sensor::TOUCH
+  sen.instance_variable_get("@port") == Sensor::PORT[:port_1] &&
+  sen.instance_variable_get("@type") == Sensor::TYPE[:touch]
 end
 
 assert('TouchSensor', 'pressed?') do
-  sen = TouchSensor.new(Sensor::PORT_2)
+  sen = TouchSensor.new(:port_2)
   sen.pressed? == false
 end
 
@@ -166,19 +168,19 @@ end
 #
 
 assert('UltrasonicSensor', 'new') do
-  sen = UltrasonicSensor.new(Sensor::PORT_1)
+  sen = UltrasonicSensor.new(:port_1)
   sen &&
   sen.class.superclass == EV3::Sensor
-  sen.instance_variable_get("@port") == Sensor::PORT_1 &&
-  sen.instance_variable_get("@type") == Sensor::ULTRASONIC
+  sen.instance_variable_get("@port") == Sensor::PORT[:port_1] &&
+  sen.instance_variable_get("@type") == Sensor::TYPE[:ultrasonic]
 end
 
 assert('UltrasonicSensor', 'distance') do
-  sen = UltrasonicSensor.new(Sensor::PORT_2)
+  sen = UltrasonicSensor.new(:port_2)
   sen.distance
 end
 
 assert('UltrasonicSensor', 'listen') do
-  sen = UltrasonicSensor.new(Sensor::PORT_3)
+  sen = UltrasonicSensor.new(:port_3)
   sen.listen == false
 end

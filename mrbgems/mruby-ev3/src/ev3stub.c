@@ -155,6 +155,12 @@ EV3_speaker_stop(void)
 }
 
 int32_t
+EV3_sensor_config(int32_t port, int32_t type)
+{
+  return 0;
+}
+
+int32_t
 EV3_color_sensor_get_ambient(int32_t port)
 {
   return 0;

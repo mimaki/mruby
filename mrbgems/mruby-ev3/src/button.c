@@ -27,7 +27,7 @@ static mrb_value
 mrb_btn_init(mrb_state *mrb, mrb_value self)
 {
   struct RClass *btn = mrb_obj_class(mrb, self);
-  mrb_value map = mrb_cv_get(mrb, mrb_obj_value(btn), mrb_intern_lit(mrb, "@@map"));
+  mrb_value map = mrb_const_get(mrb, mrb_obj_value(btn), mrb_intern_lit(mrb, "KEY"));
   mrb_sym key;
   mrb_value keyv;
 
@@ -95,10 +95,12 @@ void
 mrb_ev3_button_init(mrb_state *mrb, struct RClass *ev3)
 {
   struct RClass *btn;
+  mrb_value btno;
   mrb_value keys;
 
   /* Button class */
   btn = mrb_define_class_under(mrb, ev3, "Button", mrb->object_class);
+  btno = mrb_obj_value(btn);
 
   keys = mrb_hash_new(mrb);
   mrb_hash_set(mrb, keys, mrb_symbol_value(mrb_intern_lit(mrb, "left")), mrb_fixnum_value(LEFT_BUTTON));
@@ -107,7 +109,7 @@ mrb_ev3_button_init(mrb_state *mrb, struct RClass *ev3)
   mrb_hash_set(mrb, keys, mrb_symbol_value(mrb_intern_lit(mrb, "down")), mrb_fixnum_value(DOWN_BUTTON));
   mrb_hash_set(mrb, keys, mrb_symbol_value(mrb_intern_lit(mrb, "enter")), mrb_fixnum_value(ENTER_BUTTON));
   mrb_hash_set(mrb, keys, mrb_symbol_value(mrb_intern_lit(mrb, "back")), mrb_fixnum_value(BACK_BUTTON));
-  mrb_mod_cv_set(mrb, btn, mrb_intern_lit(mrb, "@@map"), keys);
+  mrb_const_set(mrb, btno, mrb_intern_lit(mrb, "KEY"), keys);
 
   mrb_define_class_method(mrb, btn, "[]", mrb_btn_get, MRB_ARGS_REQ(1));
 

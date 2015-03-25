@@ -13,14 +13,16 @@ assert('LCD', 'WIDTH/HEIGHT') do
   LCD.const_defined?(:HEIGHT)
 end
 
-assert('LCD', 'XXX_FONT') do
-  LCD.const_defined?(:SMALL_FONT) &&
-  LCD.const_defined?(:MEDIUM_FONT)
+assert('LCD', 'FONT') do
+  LCD.const_defined?(:FONT) &&
+  LCD::FONT[:small] &&
+  LCD::FONT[:medium]
 end
 
-assert('LCD', 'COLOR_XXXXX') do
-  LCD.const_defined?(:WHITE) &&
-  LCD.const_defined?(:BLACK)
+assert('LCD', 'COLOR') do
+  LCD.const_defined?(:COLOR) &&
+  LCD::COLOR[:white] &&
+  LCD::COLOR[:black]
 end
 
 
@@ -63,23 +65,23 @@ end
 #
 assert('LCD', 'new') do
   l1 = LCD.new
-  l1.instance_variable_get('@font')   == LCD::SMALL_FONT &&
+  l1.instance_variable_get('@font')   == LCD::FONT[:small] &&
   l1.instance_variable_get('@left')   == 0 &&
   l1.instance_variable_get('@top')    == 0 &&
   l1.instance_variable_get('@width')  == LCD::WIDTH &&
   l1.instance_variable_get('@height') == LCD::HEIGHT &&
-  l1.instance_variable_get('@color')  == LCD::BLACK
+  l1.instance_variable_get('@color')  == LCD::COLOR[:black]
 end
 
 assert('LCD', 'new(font)') do
-  l1 = LCD.new(LCD::SMALL_FONT)
-  l2 = LCD.new(LCD::MEDIUM_FONT)
-  l1.instance_variable_get('@font') == LCD::SMALL_FONT &&
-  l2.instance_variable_get('@font') == LCD::MEDIUM_FONT
+  l1 = LCD.new(:small)
+  l2 = LCD.new(:medium)
+  l1.instance_variable_get('@font') == LCD::FONT[:small]
+  l2.instance_variable_get('@font') == LCD::FONT[:medium]
 end
 
 assert('LCD', 'new(font, x, y, w, h)') do
-  l1 = LCD.new(LCD::SMALL_FONT, 1, 2, 3, 4)
+  l1 = LCD.new(:small, 1, 2, 3, 4)
   l1.instance_variable_get('@left')    == 1 &&
   l1.instance_variable_get('@top')     == 2 &&
   l1.instance_variable_get('@width')   == 3 &&
@@ -87,10 +89,10 @@ assert('LCD', 'new(font, x, y, w, h)') do
 end
 
 assert('LCD', 'new(font, x, y, w, h, col)') do
-  l1 = LCD.new(LCD::SMALL_FONT, 1, 2, 3, 4, LCD::WHITE)
-  l2 = LCD.new(LCD::SMALL_FONT, 1, 2, 3, 4, LCD::BLACK)
-  l1.instance_variable_get('@color') == LCD::WHITE &&
-  l2.instance_variable_get('@color') == LCD::BLACK
+  l1 = LCD.new(:small, 1, 2, 3, 4, :white)
+  l2 = LCD.new(:small, 1, 2, 3, 4, :black)
+  l1.instance_variable_get('@color') == LCD::COLOR[:white] &&
+  l2.instance_variable_get('@color') == LCD::COLOR[:black]
 end
 
 #
@@ -128,13 +130,13 @@ assert('LCD', 'print: line feed') do
 end
 
 assert('LCD', 'print: window(SMALL_FONT)') do
-  lcd = LCD.new(LCD::SMALL_FONT, 60, 16, 60, 16)
+  lcd = LCD.new(:small, 60, 16, 60, 16)
   lcd.print "12345678901234567890"
   lcd.cx == 0 && lcd.cy == 0
 end
 
 assert('LCD', 'print: window(MEDIUM_FONT') do
-  lcd = LCD.new(LCD::MEDIUM_FONT, 60, 20, 100, 32)
+  lcd = LCD.new(:medium, 60, 20, 100, 32)
   lcd.print "12345678901234567890"
   lcd.cx == 0 && lcd.cy == 0
 end
@@ -174,13 +176,13 @@ assert('LCD', 'puts: line feed') do
 end
 
 assert('LCD', 'puts: window') do
-  lcd = LCD.new(LCD::SMALL_FONT, 60, 16, 60, 16)
+  lcd = LCD.new(:small, 60, 16, 60, 16)
   lcd.puts "12345678901234567890"
   lcd.cx == 0 && lcd.cy == 1
 end
 
 assert('LCD', 'puts: window(MEDIUM_FONT') do
-  lcd = LCD.new(LCD::MEDIUM_FONT, 60, 20, 100, 32)
+  lcd = LCD.new(:medium, 60, 20, 100, 32)
   lcd.puts "12345678901234567890"
   lcd.cx == 0 && lcd.cy == 1
 end
@@ -197,10 +199,10 @@ end
 assert('LCD', 'clear(col)') do
   lcd1 = LCD.new
   lcd1.puts "abcdefghijklmnopqrstuvwxyz"
-  lcd1.clear(LCD::WHITE)
+  lcd1.clear(:white)
   lcd2 = LCD.new
   lcd2.puts "abcdefghijklmnopqrstuvwxyz"
-  lcd2.clear(LCD::BLACK)
+  lcd2.clear(:black)
   lcd1.cx == 0 && lcd1.cy == 0 &&
   lcd2.cx == 0 && lcd2.cy == 0
 end

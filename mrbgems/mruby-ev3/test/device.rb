@@ -1,9 +1,9 @@
 # Device class
 
 assert('Device', "class") do
-  Device.class == Class
+  EV3::Device.class == Class
 end
 
 assert('Device', 'include?(EV3)') do
-  Device.include?(EV3)
+  EV3::Device.include?(EV3)
 end

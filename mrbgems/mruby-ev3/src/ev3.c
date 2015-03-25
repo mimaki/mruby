@@ -39,6 +39,10 @@ mrb_mruby_ev3_gem_init(mrb_state *mrb)
   mrb_ev3_motor_init(mrb, ev3, dev);  /* Motor */
   mrb_ev3_sensor_init(mrb, ev3, dev); /* Sensor, ColorSensor, GyroSensor, TouchSensor, UltrasonicSensor */
 
+#ifndef EV3
+  mrb_gv_set(mrb, mrb_intern_lit(mrb, "$ev3_host"), mrb_true_value());
+#endif
+
   /* Object includes EV3 */
   mrb_include_module(mrb, mrb->object_class, ev3);
 }

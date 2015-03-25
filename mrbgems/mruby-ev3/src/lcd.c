@@ -3,6 +3,7 @@
 #include "mruby.h"
 #include "mruby/variable.h"
 #include "mruby/string.h"
+#include "mruby/hash.h"
 #include "ev3if.h"
 
 typedef struct ev3_font_size {
@@ -20,41 +21,57 @@ static ev3_font_size _font_size[2] = {{0, 8}, {0, 16}};
  *
  *  Parameters:
  *    +font+    font size.
- *       LCD::SMALL_FONT:  small font (6x8, default)
- *       LCD::MEDIUM_FONT: medium font (8x16)
+ *       :small   small font (6x8, default)
+ *       :medium  medium font (8x16)
  *    +x+       Window origin (left) X coordinate. (default: 0)
  *    +y+       Window origin (top) Y coordinate. (default: 0)
  *    +width+   Width of window. (default: LCD::WIDTH)
  *    +height+  Height of window. (default: LCD::HEIGHT)
  *    +color+   LCD foreground color.
- *       LCD::BLACK:  black (default)
- *       LCD::WHITE:  while
+ *       :black   black (default)
+ *       :white   while
  *
  *  Returns LCD object.
  */
 static mrb_value
 mrb_lcd_init(mrb_state *mrb, mrb_value self)
 {
-  mrb_int font = EV3_FONT_SMALL;
+  struct RClass *lcd = mrb_obj_class(mrb, self);
+  mrb_value fmap = mrb_const_get(mrb, mrb_obj_value(lcd), mrb_intern_lit(mrb, "FONT"));
+  mrb_value cmap = mrb_const_get(mrb, mrb_obj_value(lcd), mrb_intern_lit(mrb, "COLOR"));
+  mrb_sym font = mrb_intern_lit(mrb, "small");
+  mrb_sym col = mrb_intern_lit(mrb, "black");
+  mrb_value fontv;
+  mrb_value colv;
+  mrb_int fonti;
   mrb_int x = 0;
   mrb_int y = 0;
   mrb_int w = EV3_LCD_WIDTH;
   mrb_int h = EV3_LCD_HEIGHT;
-  mrb_int col = EV3_LCD_BLACK;
 
-  mrb_get_args(mrb, "|iiiiii", &font, &x, &y, &w, &h, &col);
+  mrb_get_args(mrb, "|niiiin", &font, &x, &y, &w, &h, &col);
 
-  if (_font_size[font].w == 0) {
+  fontv = mrb_hash_get(mrb, fmap, mrb_symbol_value(font));
+  if (mrb_nil_p(fontv)) {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid font size :%S", mrb_sym2str(mrb, font));
+  }
+  fonti = mrb_fixnum(fontv);
+  if (_font_size[fonti].w == 0) {
     /* initialize font size at 1st time */
-    EV3_font_get_size(font, &_font_size[font].w, &_font_size[font].h);
+    EV3_font_get_size(fonti, &_font_size[fonti].w, &_font_size[fonti].h);
   }
 
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@font"),   mrb_fixnum_value(font));
+  colv = mrb_hash_get(mrb, cmap, mrb_symbol_value(col));
+  if (mrb_nil_p(colv)) {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid foreground color :%S", mrb_sym2str(mrb, col));
+  }
+
+  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@font"),   fontv);
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@left"),   mrb_fixnum_value(x));
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@top"),    mrb_fixnum_value(y));
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@width"),  mrb_fixnum_value(w));
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@height"), mrb_fixnum_value(h));
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@color"),  mrb_fixnum_value(col));
+  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@color"),  colv);
 
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cx"),     mrb_fixnum_value(0));
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cy"),     mrb_fixnum_value(0));
@@ -70,20 +87,26 @@ mrb_lcd_init(mrb_state *mrb, mrb_value self)
  *
  *  Parameters:
  *    +font+    font size.
- *       LCD::SMALL_FONT:  small font
- *       LCD::MEDIUM_FONT: medium font (8x16)
+ *       :small     small font
+ *       :medium    medium font (8x16)
  *
  *  Returns nil.
  */
 static mrb_value
 mrb_lcd_set_font(mrb_state *mrb, mrb_value self)
 {
-  mrb_int font;
+  mrb_value fmap = mrb_const_get(mrb, self, mrb_intern_lit(mrb, "FONT"));
+  mrb_sym font;
+  mrb_value fontv;
 
-  mrb_get_args(mrb, "i", &font);
+  mrb_get_args(mrb, "n", &font);
+  fontv = mrb_hash_get(mrb, fmap, mrb_symbol_value(font));
+  if (mrb_nil_p(fontv)) {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid font size :%S", mrb_sym2str(mrb, font));
+  }
 
-  EV3_lcd_set_font((int16_t)font);
-  mrb_cv_set(mrb, self, mrb_intern_lit(mrb, "@@font"), mrb_fixnum_value(font));
+  EV3_lcd_set_font(mrb_fixnum(fontv));
+  mrb_cv_set(mrb, self, mrb_intern_lit(mrb, "@@font"), fontv);
 
   return mrb_nil_value();
 }
@@ -205,8 +228,8 @@ mrb_lcd_print_line(mrb_state *mrb, mrb_value lcd, mrb_value *str)
   mrb_free(mrb, buf);
 
   /* update cursor */
-  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(csr)); 
-  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value(cy)); 
+  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(csr));
+  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value(cy));
 }
 
 /*
@@ -344,30 +367,38 @@ mrb_lcd_locate(mrb_state *mrb, mrb_value self)
 
 /*
  *  call-seq:
- *     lcd.clear  # => nil
+ *     lcd.clear(col)  # => nil
  *
  *  Clear window.
+ *
+ *  Parameters:
+ *    +col+     LCD foreground color.
+ *       :black   black (default)
+ *       :white   while
  *
  *  Returns nil.
  */
 static mrb_value
 mrb_lcd_clear(mrb_state *mrb, mrb_value self)
 {
-  mrb_int col = -1;
+  struct RClass *lcd = mrb_obj_class(mrb, self);
+  mrb_value cmap = mrb_const_get(mrb, mrb_obj_value(lcd), mrb_intern_lit(mrb, "COLOR"));
+  mrb_sym col = mrb_intern_lit(mrb, "black");
+  mrb_value colv;
   mrb_int x, y, w, h;
 
-  mrb_get_args(mrb, "|i", &col);
+  mrb_get_args(mrb, "|n", &col);
 
-  if (col < 0) {
-    struct RClass *lcd = mrb_obj_class(mrb, self);
-    col = mrb_fixnum(mrb_cv_get(mrb, mrb_obj_value(lcd), mrb_intern_lit(mrb, "@@font"))) ? 0 : 1;
+  colv = mrb_hash_get(mrb, cmap, mrb_symbol_value(col));
+  if (mrb_nil_p(colv)) {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid foreground color :%S", mrb_sym2str(mrb, col));
   }
 
   x = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@left")));
   y = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@top")));
   w = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@width")));
   h = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@height")));
-  EV3_lcd_fill_rect(x, y, w, h, col);
+  EV3_lcd_fill_rect(x, y, w, h, mrb_fixnum(colv) ? 0 : 1);
 
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(0));
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value(0));
@@ -380,17 +411,25 @@ mrb_ev3_lcd_init(mrb_state *mrb, struct RClass *ev3)
 {
   struct RClass *lcd;
   mrb_value lcdo;
+  mrb_value font;
+  mrb_value col;
 
   /* LCD class */
   lcd = mrb_define_class_under(mrb, ev3, "LCD", mrb->object_class);
   lcdo = mrb_obj_value(lcd);
 
+  font = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, font, mrb_symbol_value(mrb_intern_lit(mrb, "small")),   mrb_fixnum_value(EV3_FONT_SMALL));
+  mrb_hash_set(mrb, font, mrb_symbol_value(mrb_intern_lit(mrb, "medium")),  mrb_fixnum_value(EV3_FONT_MEDIUM));
+  mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "FONT"), font);
+
+  col = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "white")), mrb_fixnum_value(EV3_LCD_WHITE));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "black")), mrb_fixnum_value(EV3_LCD_BLACK));
+  mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "COLOR"), col);
+
   mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "WIDTH"),        mrb_fixnum_value(EV3_LCD_WIDTH));
   mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "HEIGHT"),       mrb_fixnum_value(EV3_LCD_HEIGHT));
-  mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "SMALL_FONT"),   mrb_fixnum_value(EV3_FONT_SMALL));
-  mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "MEDIUM_FONT"),  mrb_fixnum_value(EV3_FONT_MEDIUM));
-  mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "WHITE"),        mrb_fixnum_value(EV3_LCD_WHITE));
-  mrb_const_set(mrb, lcdo, mrb_intern_lit(mrb, "BLACK"),        mrb_fixnum_value(EV3_LCD_BLACK));
 
   mrb_mod_cv_set(mrb, lcd, mrb_intern_lit(mrb, "@@font"),       mrb_fixnum_value(EV3_FONT_SMALL));
 
@@ -403,4 +442,6 @@ mrb_ev3_lcd_init(mrb_state *mrb, struct RClass *ev3)
   mrb_define_method(mrb, lcd, "locate",     mrb_lcd_locate, MRB_ARGS_ARG(1, 1));
   mrb_define_method(mrb, lcd, "clear",      mrb_lcd_clear,  MRB_ARGS_OPT(1));
 
+  // mrb_undef_method(mrb, mrb->kernel_module, "__printstr__");
+  // mrb_define_method(mrb, mrb->kernel_module, "__printstr__", mrb_lcd_print, MRB_ARGS_ANY());
 }

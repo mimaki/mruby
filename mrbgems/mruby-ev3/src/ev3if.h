@@ -161,6 +161,7 @@ int32_t EV3_motor_rotate(int32_t, int32_t, int32_t, int32_t);
 int32_t EV3_motor_get_count(int32_t);
 int32_t EV3_motor_reset_count(int32_t);
 /* Sensor */
+int32_t EV3_sensor_config(int32_t, int32_t);
 int32_t EV3_color_sensor_get_ambient(int32_t);
 int32_t EV3_color_sensor_get_color(int32_t);
 int32_t EV3_color_sensor_get_reflect(int32_t);

@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "mruby.h"
-// #include "mruby/value.h"
 #include "mruby/variable.h"
-// #include "mruby/class.h"
-// #include "mruby/string.h"
-// #include "mruby/hash.h"
+#include "mruby/hash.h"
 #include "ev3if.h"
 #include "rtosif.h"
 
@@ -13,10 +10,22 @@
 static mrb_value
 mrb_sensor_init(mrb_state *mrb, mrb_value self, mrb_int type)
 {
-  mrb_int port;
-  mrb_get_args(mrb, "i", &port);
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@port"), mrb_fixnum_value(port));
+  struct RClass *sen = mrb_obj_class(mrb, self);
+  mrb_value pmap = mrb_const_get(mrb, mrb_obj_value(sen), mrb_intern_lit(mrb, "PORT"));
+  mrb_sym port;
+  mrb_value portv;
+
+  mrb_get_args(mrb, "n", &port);
+  portv = mrb_hash_get(mrb, pmap, mrb_symbol_value(port));
+  if (mrb_nil_p(portv)) {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid sensor port :%S", mrb_sym2str(mrb, port));
+  }
+
+  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@port"), portv);
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@type"), mrb_fixnum_value(type));
+
+  EV3_sensor_config(mrb_fixnum(portv), type);
+
   return self;
 }
 
@@ -28,10 +37,10 @@ mrb_sensor_init(mrb_state *mrb, mrb_value self, mrb_int type)
  *
  *  Parameters:
  *    +port+    ColorSensor port
- *       Sensor::PORT_1
- *       Sensor::PORT_2
- *       Sensor::PORT_3
- *       Sensor::PORT_4
+ *       :port_1    PORT 1
+ *       :port_2    PORT 2
+ *       :port_3    PORT 3
+ *       :port_4    PORT 4
  *
  *  Returns ColorSensor object.
  */
@@ -64,14 +73,14 @@ mrb_color_sensor_get_ambient(mrb_state *mrb, mrb_value self)
  *  Get color.
  *
  *  Returns color ID.
- *    0: NONE
- *    1: BLACK
- *    2: BLUE
- *    3: GREEN
- *    4: YELLOW
- *    5: RED
- *    6: WHITE
- *    7: BROWN
+ *    0: COLOR[:none]
+ *    1: COLOR[:black]
+ *    2: COLOR[:blue]
+ *    3: COLOR[:green]
+ *    4: COLOR[:yellow]
+ *    5: COLOR[:red]
+ *    6: COLOR[:white]
+ *    7: COLOR[:brown]
  */
 static mrb_value
 mrb_color_sensor_get_color(mrb_state *mrb, mrb_value self)
@@ -210,10 +219,10 @@ mrb_color_sensor_is_brown(mrb_state *mrb, mrb_value self)
  *
  *  Parameters:
  *    +port+    GyroSensor port
- *       Sensor::PORT_1
- *       Sensor::PORT_2
- *       Sensor::PORT_3
- *       Sensor::PORT_4
+ *       :port_1    PORT 1
+ *       :port_2    PORT 2
+ *       :port_3    PORT 3
+ *       :port_4    PORT 4
  *
  *  Returns GyroSensor object.
  */
@@ -331,10 +340,10 @@ mrb_gyro_sensor_get_offset(mrb_state *mrb, mrb_value self)
  *
  *  Parameters:
  *    +port+    TouchSensor port
- *       Sensor::PORT_1
- *       Sensor::PORT_2
- *       Sensor::PORT_3
- *       Sensor::PORT_4
+ *       :port_1    PORT 1
+ *       :port_2    PORT 2
+ *       :port_3    PORT 3
+ *       :port_4    PORT 4
  *
  *  Returns TouchSensor object.
  */
@@ -368,10 +377,10 @@ mrb_touch_sensor_is_pressed(mrb_state *mrb, mrb_value self)
  *
  *  Parameters:
  *    +port+    UltrasonicSensor port
- *       Sensor::PORT_1
- *       Sensor::PORT_2
- *       Sensor::PORT_3
- *       Sensor::PORT_4
+ *       :port_1    PORT 1
+ *       :port_2    PORT 2
+ *       :port_3    PORT 3
+ *       :port_4    PORT 4
  *
  *  Returns UltrasonicSensor object.
  */
@@ -418,33 +427,40 @@ mrb_ev3_sensor_init(mrb_state *mrb, struct RClass *ev3, struct RClass *dev)
 {
   struct RClass *sen, *cls, *gys, *tos, *uss;
   mrb_value seno, clso;
+  mrb_value port, type, col;
 
   /* Sensor class */
   sen = mrb_define_class_under(mrb, ev3, "Sensor", dev);
   seno = mrb_obj_value(sen);
 
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "PORT_1"),     mrb_fixnum_value(EV3_PORT_1));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "PORT_2"),     mrb_fixnum_value(EV3_PORT_2));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "PORT_3"),     mrb_fixnum_value(EV3_PORT_3));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "PORT_4"),     mrb_fixnum_value(EV3_PORT_4));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "NONE"),       mrb_fixnum_value(NONE_SENSOR));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "ULTRASONIC"), mrb_fixnum_value(ULTRASONIC_SENSOR));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "GYRO"),       mrb_fixnum_value(GYRO_SENSOR));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "TOUCH"),      mrb_fixnum_value(TOUCH_SENSOR));
-  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "COLOR"),      mrb_fixnum_value(COLOR_SENSOR));
+  port = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, port, mrb_symbol_value(mrb_intern_lit(mrb, "port_1")), mrb_fixnum_value(EV3_PORT_1));
+  mrb_hash_set(mrb, port, mrb_symbol_value(mrb_intern_lit(mrb, "port_2")), mrb_fixnum_value(EV3_PORT_2));
+  mrb_hash_set(mrb, port, mrb_symbol_value(mrb_intern_lit(mrb, "port_3")), mrb_fixnum_value(EV3_PORT_3));
+  mrb_hash_set(mrb, port, mrb_symbol_value(mrb_intern_lit(mrb, "port_4")), mrb_fixnum_value(EV3_PORT_4));
+  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "PORT"), port);
+
+  type = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, type, mrb_symbol_value(mrb_intern_lit(mrb, "ultrasonic")), mrb_fixnum_value(ULTRASONIC_SENSOR));
+  mrb_hash_set(mrb, type, mrb_symbol_value(mrb_intern_lit(mrb, "gyro")),       mrb_fixnum_value(GYRO_SENSOR));
+  mrb_hash_set(mrb, type, mrb_symbol_value(mrb_intern_lit(mrb, "touch")),      mrb_fixnum_value(TOUCH_SENSOR));
+  mrb_hash_set(mrb, type, mrb_symbol_value(mrb_intern_lit(mrb, "color")),      mrb_fixnum_value(COLOR_SENSOR));
+  mrb_const_set(mrb, seno, mrb_intern_lit(mrb, "TYPE"), type);
 
   /* Color sensor class */
   cls = mrb_define_class_under(mrb, ev3, "ColorSensor", sen);
   clso = mrb_obj_value(sen);
 
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "NONE"),   mrb_fixnum_value(COLOR_NONE));
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "BLACK"),  mrb_fixnum_value(COLOR_BLACK));
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "BLUE"),   mrb_fixnum_value(COLOR_BLUE));
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "GREEN"),  mrb_fixnum_value(COLOR_GREEN));
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "YELLOW"), mrb_fixnum_value(COLOR_YELLOW));
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "RED"),    mrb_fixnum_value(COLOR_RED));
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "WHITE"),  mrb_fixnum_value(COLOR_WHITE));
-  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "BROWN"),  mrb_fixnum_value(COLOR_BROWN));
+  col = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "none")),   mrb_fixnum_value(COLOR_NONE));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "black")),  mrb_fixnum_value(COLOR_BLACK));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "blue")),   mrb_fixnum_value(COLOR_BLUE));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "green")),  mrb_fixnum_value(COLOR_GREEN));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "yellow")), mrb_fixnum_value(COLOR_YELLOW));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "red")),    mrb_fixnum_value(COLOR_RED));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "white")),  mrb_fixnum_value(COLOR_WHITE));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "brown")),  mrb_fixnum_value(COLOR_BROWN));
+  mrb_const_set(mrb, clso, mrb_intern_lit(mrb, "COLOR"), col);
 
   mrb_define_method(mrb, cls, "initialize", mrb_color_sensor_init,        MRB_ARGS_REQ(1));
   mrb_define_method(mrb, cls, "ambient",    mrb_color_sensor_get_ambient, MRB_ARGS_NONE());

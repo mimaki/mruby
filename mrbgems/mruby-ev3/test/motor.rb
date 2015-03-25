@@ -12,23 +12,25 @@ assert('Motor', 'superclass') do
   Motor.superclass == Device
 end
 
-assert('Motor', 'constants') do
-  Motor::PORT_A   == 0 &&
-  Motor::PORT_B   == 1 &&
-  Motor::PORT_C   == 2 &&
-  Motor::PORT_D   == 3 &&
-  Motor::NONE     == 0 &&
-  Motor::MEDIUM   == 1 &&
-  Motor::LARGE    == 2 &&
-  Motor::UNKNOWN  == 3
+assert('Motor', 'PORT') do
+  Motor::PORT[:port_a] == 0 &&
+  Motor::PORT[:port_b] == 1 &&
+  Motor::PORT[:port_c] == 2 &&
+  Motor::PORT[:port_d] == 3
+end
+
+assert('Motor', 'TYPE') do
+  Motor::TYPE[:medium]  == 1 &&
+  Motor::TYPE[:large]   == 2 &&
+  Motor::TYPE[:unknown] == 3
 end
 
 assert('Motor', 'new') do
   mtr = []
-  mtr << Motor.new(Motor::PORT_A, Motor::LARGE)
-  mtr << Motor.new(Motor::PORT_B, Motor::MEDIUM)
-  mtr << Motor.new(Motor::PORT_C, Motor::NONE)
-  mtr << Motor.new(Motor::PORT_D, Motor::UNKNOWN)
+  mtr << Motor.new(:port_a)
+  mtr << Motor.new("port_b", "medium")
+  mtr << Motor.new(:port_c,  "large")
+  mtr << Motor.new("port_d", "unknown")
   mtr.size == 4
 end
 
@@ -39,29 +41,29 @@ assert('Motor', 'new: parameter error') do
   rescue => e1
   end
   begin
-    Motor.new(Motor::PORT_A)
+    Motor.new(:port_a)
   rescue => e2
   end
-  e1 && e2
+  e1 && !e2
 end
 
 assert('Motor', 'port') do
-  Motor.new(Motor::PORT_A, Motor::NONE).port    == Motor::PORT_A &&
-  Motor.new(Motor::PORT_B, Motor::MEDIUM).port  == Motor::PORT_B &&
-  Motor.new(Motor::PORT_C, Motor::LARGE).port   == Motor::PORT_C &&
-  Motor.new(Motor::PORT_D, Motor::UNKNOWN).port == Motor::PORT_D
+  Motor.new(:port_a).port == Motor::PORT[:port_a] &&
+  Motor.new(:port_b).port == Motor::PORT[:port_b] &&
+  Motor.new(:port_c).port == Motor::PORT[:port_c] &&
+  Motor.new(:port_d).port == Motor::PORT[:port_d]
 end
 
 assert('Motor', 'type') do
-  Motor.new(Motor::PORT_A, Motor::NONE).type    == Motor::NONE &&
-  Motor.new(Motor::PORT_B, Motor::MEDIUM).type  == Motor::MEDIUM &&
-  Motor.new(Motor::PORT_C, Motor::LARGE).type   == Motor::LARGE &&
-  Motor.new(Motor::PORT_D, Motor::UNKNOWN).type == Motor::UNKNOWN
+  Motor.new(:port_a).type           == Motor::TYPE[:large] &&
+  Motor.new(:port_b, :medium).type  == Motor::TYPE[:medium] &&
+  Motor.new(:port_c, :large).type   == Motor::TYPE[:large] &&
+  Motor.new(:port_d, :unknown).type == Motor::TYPE[:unknown]
 end
 
 assert('Motor', 'power') do
   b = true
-  mtr = Motor.new(Motor::PORT_A, Motor::LARGE)
+  mtr = Motor.new(:port_a)
   [0, 100, -100, 200, -200].each {|pwr|
     mtr.power = pwr
     pwr = 100 if pwr > 100
@@ -74,7 +76,7 @@ end
 assert('Motor', 'stop') do
   e = nil
   begin
-    mtr = Motor.new(Motor::PORT_A, Motor::LARGE)
+    mtr = Motor.new(:port_a)
     mtr.stop
     mtr.stop(true)
   rescue => e
@@ -83,7 +85,7 @@ assert('Motor', 'stop') do
 end
 
 assert('Motor', 'rotate') do
-  mtr = Motor.new(Motor::PORT_A, Motor::LARGE)
+  mtr = Motor.new(:port_a)
   mtr.rotate(10, 20)
   b = (mtr.count == 10)
   mtr.rotate(-100, 100, 1)
@@ -91,7 +93,7 @@ assert('Motor', 'rotate') do
 end
 
 assert('Motor', 'rotate: parameter error') do
-  mtr = Motor.new(Motor::PORT_A, Motor::LARGE)
+  mtr = Motor.new(:port_a)
   e1 = e2 = nil
   begin
     mtr.rotate
@@ -105,13 +107,13 @@ assert('Motor', 'rotate: parameter error') do
 end
 
 assert('Motor', 'count') do
-  mtr = Motor.new(Motor::PORT_A, Motor::LARGE)
+  mtr = Motor.new(:port_a)
   mtr.rotate(123, 100)
   mtr.count == 123
 end
 
 assert('Motor', 'reset_count') do
-  mtr = Motor.new(Motor::PORT_A, Motor::LARGE)
+  mtr = Motor.new(:port_a)
   mtr.rotate(10, 20)
   mtr.reset_count
   mtr.count == 0
