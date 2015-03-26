@@ -63,7 +63,8 @@ static const tone_info _tones[] =
 static mrb_value
 mrb_sound_tone(mrb_state *mrb, mrb_value self)
 {
-  mrb_value obj, map, tone = mrb_nil_value();
+  mrb_value map = mrb_const_get(mrb, self, mrb_intern_lit(mrb, "TONE"));
+  mrb_value obj, tone = mrb_nil_value();
   mrb_int ms;
   mrb_sym sym;
 
@@ -74,15 +75,12 @@ mrb_sound_tone(mrb_state *mrb, mrb_value self)
   else if (mrb_float_p(obj)) {
     tone = mrb_fixnum_value((mrb_int)(mrb_float(obj) + 0.5));
   }
-  else {
-    map = mrb_cv_get(mrb, self, mrb_intern_lit(mrb, "@@tones"));
-    if (mrb_symbol_p(obj)) {
-      tone = mrb_hash_get(mrb, map, obj);
-    }
-    else if (mrb_string_p(obj)) {
-      sym = mrb_intern_cstr(mrb, mrb_string_value_cstr(mrb, &obj));
-      tone = mrb_hash_get(mrb, map, mrb_symbol_value(sym));
-    }
+  else if (mrb_symbol_p(obj)) {
+    tone = mrb_hash_get(mrb, map, obj);
+  }
+  else if (mrb_string_p(obj)) {
+    sym = mrb_intern_cstr(mrb, mrb_string_value_cstr(mrb, &obj));
+    tone = mrb_hash_get(mrb, map, mrb_symbol_value(sym));
   }
   if (mrb_nil_p(tone)) {
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid tone (%S)", obj);
@@ -132,17 +130,19 @@ void
 mrb_ev3_sound_init(mrb_state *mrb, struct RClass *ev3)
 {
   struct RClass *snd;
+  mrb_value sndo;
   mrb_value tones;
   int i;
 
   /* Sound class */
   snd = mrb_define_class_under(mrb, ev3, "Sound", mrb->object_class);
+  sndo = mrb_obj_value(snd);
 
   tones = mrb_hash_new(mrb);
   for (i=0; i<sizeof(_tones)/sizeof(_tones[0]); i++) {
     mrb_hash_set(mrb, tones, mrb_symbol_value(mrb_intern_cstr(mrb, _tones[i].tone)), mrb_fixnum_value(_tones[i].freq));
   }
-  mrb_mod_cv_set(mrb, snd, mrb_intern_lit(mrb, "@@tones"), tones);
+  mrb_const_set(mrb, sndo, mrb_intern_lit(mrb, "TONE"), tones);
 
   mrb_define_class_method(mrb, snd, "tone",     mrb_sound_tone,       MRB_ARGS_REQ(2));
   mrb_define_class_method(mrb, snd, "volume=",  mrb_sound_set_volume, MRB_ARGS_REQ(1));

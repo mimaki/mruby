@@ -8,20 +8,21 @@ assert('LED', 'include?(EV3)') do
   LED.include?(EV3)
 end
 
-assert('LED', 'constants') do
-  LED::OFF    == 0 &&
-  LED::RED    == 1 &&
-  LED::GREEN  == 2 &&
-  LED::ORANGE == 3
+assert('LED', 'COLOR') do
+  LED.const_defined?(:COLOR) &&
+  LED::COLOR[:off]    == 0 &&
+  LED::COLOR[:red]    == 1 &&
+  LED::COLOR[:green]  == 2 &&
+  LED::COLOR[:orange] == 3
 end
 
 assert('LED', "color=") do
   e = nil
   begin
-    LED.color = LED::RED
-    LED.color = LED::GREEN
-    LED.color = LED::ORANGE
-    LED.color = LED::OFF
+    LED.color = :red
+    LED.color = :green
+    LED.color = :orange
+    LED.color = :off
   rescue => e
   end
   !e

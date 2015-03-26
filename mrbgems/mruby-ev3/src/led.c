@@ -2,6 +2,7 @@
 #include <string.h>
 #include "mruby.h"
 #include "mruby/variable.h"
+#include "mruby/hash.h"
 #include "ev3if.h"
 
 
@@ -23,9 +24,17 @@
 static mrb_value
 mrb_led_color(mrb_state *mrb, mrb_value self)
 {
-  mrb_int col;
-  mrb_get_args(mrb, "i", &col);
-  EV3_led_set_color(col);
+  mrb_value cmap = mrb_const_get(mrb, self, mrb_intern_lit(mrb, "COLOR"));
+  mrb_sym col;
+  mrb_value colv;
+
+  mrb_get_args(mrb, "n", &col);
+  colv = mrb_hash_get(mrb, cmap, mrb_symbol_value(col));
+  if (mrb_nil_p(colv)) {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid color :%S", mrb_sym2str(mrb, col));
+  }
+
+  EV3_led_set_color(mrb_fixnum(colv));
   return mrb_nil_value();
 }
 
@@ -50,15 +59,18 @@ mrb_ev3_led_init(mrb_state *mrb, struct RClass *ev3)
 {
   struct RClass *led;
   mrb_value ledo;
+  mrb_value col;
 
   /* LED class */
   led = mrb_define_class_under(mrb, ev3, "LED", mrb->object_class);
   ledo = mrb_obj_value(led);
 
-  mrb_const_set(mrb, ledo, mrb_intern_lit(mrb, "OFF"),    mrb_fixnum_value(LED_OFF));
-  mrb_const_set(mrb, ledo, mrb_intern_lit(mrb, "RED"),    mrb_fixnum_value(LED_RED));
-  mrb_const_set(mrb, ledo, mrb_intern_lit(mrb, "GREEN"),  mrb_fixnum_value(LED_GREEN));
-  mrb_const_set(mrb, ledo, mrb_intern_lit(mrb, "ORANGE"), mrb_fixnum_value(LED_ORANGE));
+  col = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "off")),    mrb_fixnum_value(LED_OFF));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "red")),    mrb_fixnum_value(LED_RED));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "green")),  mrb_fixnum_value(LED_GREEN));
+  mrb_hash_set(mrb, col, mrb_symbol_value(mrb_intern_lit(mrb, "orange")), mrb_fixnum_value(LED_ORANGE));
+  mrb_const_set(mrb, ledo, mrb_intern_lit(mrb, "COLOR"), col);
 
   mrb_define_class_method(mrb, led, "color=", mrb_led_color,  MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, led, "off",    mrb_led_off,    MRB_ARGS_NONE());

@@ -8,11 +8,16 @@ assert('Sound', 'include?(EV3)') do
   Sound.include?(EV3)
 end
 
+assert('Sound', 'TONE') do
+  Sound.const_defined?(:TONE) #&&
+  Sound::TONE[:c4]
+end
+
 assert('Sound', 'tone') do
   Sound.tone(0,    0) == nil &&
   Sound.tone(0.0,  0) == nil &&
-  Sound.tone(:c4,  0) == nil &&
-  Sound.tone("c5", 0) == nil
+  Sound.tone(:d4,  0) == nil &&
+  Sound.tone("d5", 0) == nil
 end
 
 assert('Sound', 'tone: parameter error') do
