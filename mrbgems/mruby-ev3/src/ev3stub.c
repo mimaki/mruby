@@ -11,13 +11,13 @@ typedef struct ev3_motor {
 static ev3_motor gMotor[4];
 
 int32_t
-EV3_lcd_set_font(int32_t font)
+ev3_lcd_set_font(int32_t font)
 {
   return 0;
 }
 
 int32_t
-EV3_font_get_size(int32_t font, int32_t *pwidth, int32_t *pheight)
+ev3_font_get_size(int32_t font, int32_t *pwidth, int32_t *pheight)
 {
   switch(font) {
   case 0:
@@ -35,39 +35,39 @@ EV3_font_get_size(int32_t font, int32_t *pwidth, int32_t *pheight)
 }
 
 int32_t
-EV3_lcd_draw_string(const char *buf, int32_t x, int32_t y)
+ev3_lcd_draw_string(const char *buf, int32_t x, int32_t y)
 {
   MRBEV3_PRINTF("%s", buf);
   return 0;
 }
 
 int32_t
-EV3_lcd_fill_rect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t color)
+ev3_lcd_fill_rect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t color)
 {
   return 0;
 }
 
 int32_t
-EV3_button_is_pressed(int32_t key)
+ev3_button_is_pressed(int32_t key)
 {
   return 0;
 }
 
 int32_t
-EV3_led_set_color(int32_t col)
+ev3_led_set_color(int32_t col)
 {
   return 0;
 }
 
 
 int32_t
-EV3_motor_config(int32_t port, int32_t type)
+ev3_motor_config(int32_t port, int32_t type)
 {
   return 0;
 }
 
 int32_t
-EV3_motor_set_power(int32_t port, int32_t speed)
+ev3_motor_set_power(int32_t port, int32_t speed)
 {
   if (port < 0 && port >= TNUM_MOTOR_PORT) {
     return 0;
@@ -78,7 +78,7 @@ EV3_motor_set_power(int32_t port, int32_t speed)
 }
 
 int32_t
-EV3_motor_get_power(int32_t port)
+ev3_motor_get_power(int32_t port)
 {
   if (port < 0 && port >= TNUM_MOTOR_PORT) {
     return 0;
@@ -87,7 +87,7 @@ EV3_motor_get_power(int32_t port)
 }
 
 int32_t
-EV3_motor_stop(int32_t port, int32_t brake)
+ev3_motor_stop(int32_t port, int32_t brake)
 {
   if (port < 0 && port >= TNUM_MOTOR_PORT) {
     return -1;
@@ -96,7 +96,7 @@ EV3_motor_stop(int32_t port, int32_t brake)
 }
 
 int32_t
-EV3_motor_rotate(int32_t port, int32_t deg, int32_t spd, int32_t blk)
+ev3_motor_rotate(int32_t port, int32_t deg, int32_t spd, int32_t blk)
 {
   if (port < 0 && port >= TNUM_MOTOR_PORT) {
     return -1;
@@ -106,7 +106,7 @@ EV3_motor_rotate(int32_t port, int32_t deg, int32_t spd, int32_t blk)
 }
 
 int32_t
-EV3_motor_get_count(int32_t port)
+ev3_motor_get_counts(int32_t port)
 {
   if (port < 0 && port >= TNUM_MOTOR_PORT) {
     return 0;
@@ -115,7 +115,7 @@ EV3_motor_get_count(int32_t port)
 }
 
 int32_t
-EV3_motor_reset_count(int32_t port)
+ev3_motor_reset_counts(int32_t port)
 {
   if (port < 0 && port >= TNUM_MOTOR_PORT) {
     return -1;
@@ -125,93 +125,105 @@ EV3_motor_reset_count(int32_t port)
 }
 
 int
-EV3_battery_current_mA(void)
+ev3_battery_current_mA(void)
 {
   return 100;
 }
 
 int
-EV3_battery_voltage_mV(void)
+ev3_battery_voltage_mV(void)
 {
   return 8900;
 }
 
 int32_t
-EV3_speaker_play_tone(uint16_t freq, int32_t ms)
+ev3_speaker_play_tone(uint16_t freq, int32_t ms)
 {
   return 0;
 }
 
 int32_t
-EV3_speaker_set_volume(uint8_t vol)
+ev3_speaker_set_volume(uint8_t vol)
 {
   return 0;
 }
 
 int32_t
-EV3_speaker_stop(void)
+ev3_speaker_stop(void)
 {
   return 0;
 }
 
 int32_t
-EV3_sensor_config(int32_t port, int32_t type)
+ev3_sensor_config(int32_t port, int32_t type)
 {
   return 0;
 }
 
 int32_t
-EV3_color_sensor_get_ambient(int32_t port)
+ev3_color_sensor_get_ambient(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_color_sensor_get_color(int32_t port)
+ev3_color_sensor_get_color(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_color_sensor_get_reflect(int32_t port)
+ev3_color_sensor_get_reflect(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_gyro_sensor_get_angle(int32_t port)
+ev3_gyro_sensor_get_angle(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_gyro_sensor_get_rate(int32_t port)
+ev3_gyro_sensor_get_rate(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_gyro_sensor_reset(int32_t port)
+ev3_gyro_sensor_reset(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_touch_sensor_is_pressed(int32_t port)
+ev3_touch_sensor_is_pressed(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_ultrasonic_sensor_get_distance(int32_t port)
+ev3_ultrasonic_sensor_get_distance(int32_t port)
 {
   return 0;
 }
 
 int32_t
-EV3_ultrasonic_sensor_listen(int32_t port)
+ev3_ultrasonic_sensor_listen(int32_t port)
 {
   return 0;
+}
+
+void balance_init(void)
+{
+}
+
+void balance_control(float forward, float turn,
+  float gyro, float gyro_offset,
+  float theta_l, float theta_r, float battery,
+  signed char *pwm_l, signed char *pwm_r)
+{
+  *pwm_l = *pwm_r = 0;
 }
 
 #endif

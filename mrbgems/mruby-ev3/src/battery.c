@@ -16,7 +16,7 @@
 static mrb_value
 mrb_battery_mA(mrb_state *mrb, mrb_value self)
 {
-  return mrb_fixnum_value(EV3_battery_current_mA());
+  return mrb_fixnum_value(ev3_battery_current_mA());
 }
 
 /*
@@ -30,7 +30,7 @@ mrb_battery_mA(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_battery_mV(mrb_state *mrb, mrb_value self)
 {
-  return mrb_fixnum_value(EV3_battery_voltage_mV());
+  return mrb_fixnum_value(ev3_battery_voltage_mV());
 }
 
 

@@ -34,7 +34,7 @@ mrb_led_color(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid color :%S", mrb_sym2str(mrb, col));
   }
 
-  EV3_led_set_color(mrb_fixnum(colv));
+  ev3_led_set_color(mrb_fixnum(colv));
   return mrb_nil_value();
 }
 
@@ -49,7 +49,7 @@ mrb_led_color(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_led_off(mrb_state *mrb, mrb_value self)
 {
-  EV3_led_set_color(LED_OFF);
+  ev3_led_set_color(LED_OFF);
   return mrb_nil_value();
 }
 

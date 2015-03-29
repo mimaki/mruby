@@ -86,7 +86,7 @@ mrb_sound_tone(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid tone (%S)", obj);
   }
 
-  EV3_speaker_play_tone(mrb_fixnum(tone), ms);
+  ev3_speaker_play_tone(mrb_fixnum(tone), ms);
   return mrb_nil_value();
 }
 
@@ -106,7 +106,7 @@ mrb_sound_set_volume(mrb_state *mrb, mrb_value self)
 {
   mrb_int vol;
   mrb_get_args(mrb, "i", &vol);
-  EV3_speaker_set_volume((uint16_t)vol);
+  ev3_speaker_set_volume((uint16_t)vol);
   return mrb_nil_value();
 }
 
@@ -121,7 +121,7 @@ mrb_sound_set_volume(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_sound_stop(mrb_state *mrb, mrb_value self)
 {
-  EV3_speaker_stop();
+  ev3_speaker_stop();
   return mrb_nil_value();
 }
 

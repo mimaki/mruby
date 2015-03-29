@@ -136,40 +136,44 @@ typedef enum {
 } colorid_t;
 
 /* LCD */
-int32_t EV3_lcd_set_font(int32_t);
-int32_t EV3_font_get_size(int32_t, int32_t*, int32_t*);
-int32_t EV3_lcd_draw_string(const char*, int32_t, int32_t);
-int32_t EV3_lcd_fill_rect(int32_t, int32_t, int32_t, int32_t, int32_t);
+int32_t ev3_lcd_set_font(int32_t);
+int32_t ev3_font_get_size(int32_t, int32_t*, int32_t*);
+int32_t ev3_lcd_draw_string(const char*, int32_t, int32_t);
+int32_t ev3_lcd_fill_rect(int32_t, int32_t, int32_t, int32_t, int32_t);
 /* Button */
-int32_t EV3_button_is_pressed(int32_t);
-int32_t EV3_button_set_on_clicked(int32_t, ISR, intptr_t);
+int32_t ev3_button_is_pressed(int32_t);
+int32_t ev3_button_set_on_clicked(int32_t, ISR, intptr_t);
 /* Battery */
-int EV3_battery_current_mA(void);
-int EV3_battery_voltage_mV(void);
+int ev3_battery_current_mA(void);
+int ev3_battery_voltage_mV(void);
 /* LED */
-int32_t EV3_led_set_color(int32_t);
+int32_t ev3_led_set_color(int32_t);
 /* Sound */
-int32_t EV3_speaker_play_tone(uint16_t, int32_t);
-int32_t EV3_speaker_set_volume(uint8_t);
-int32_t EV3_speaker_stop(void);
+int32_t ev3_speaker_play_tone(uint16_t, int32_t);
+int32_t ev3_speaker_set_volume(uint8_t);
+int32_t ev3_speaker_stop(void);
 /* Motor */
-int32_t EV3_motor_config(int32_t, int32_t);
-int32_t EV3_motor_set_power(int32_t, int32_t);
-int32_t EV3_motor_get_power(int32_t);
-int32_t EV3_motor_stop(int32_t, int32_t);
-int32_t EV3_motor_rotate(int32_t, int32_t, int32_t, int32_t);
-int32_t EV3_motor_get_count(int32_t);
-int32_t EV3_motor_reset_count(int32_t);
+int32_t ev3_motor_config(int32_t, int32_t);
+int32_t ev3_motor_set_power(int32_t, int32_t);
+int32_t ev3_motor_get_power(int32_t);
+int32_t ev3_motor_stop(int32_t, int32_t);
+int32_t ev3_motor_rotate(int32_t, int32_t, int32_t, int32_t);
+int32_t ev3_motor_get_counts(int32_t);
+int32_t ev3_motor_reset_counts(int32_t);
 /* Sensor */
-int32_t EV3_sensor_config(int32_t, int32_t);
-int32_t EV3_color_sensor_get_ambient(int32_t);
-int32_t EV3_color_sensor_get_color(int32_t);
-int32_t EV3_color_sensor_get_reflect(int32_t);
-int32_t EV3_gyro_sensor_get_angle(int32_t);
-int32_t EV3_gyro_sensor_get_rate(int32_t);
-int32_t EV3_gyro_sensor_reset(int32_t);
-int32_t EV3_touch_sensor_is_pressed(int32_t);
-int32_t EV3_ultrasonic_sensor_get_distance(int32_t);
-int32_t EV3_ultrasonic_sensor_listen(int32_t);
+int32_t ev3_sensor_config(int32_t, int32_t);
+int32_t ev3_color_sensor_get_ambient(int32_t);
+int32_t ev3_color_sensor_get_color(int32_t);
+int32_t ev3_color_sensor_get_reflect(int32_t);
+int32_t ev3_gyro_sensor_get_angle(int32_t);
+int32_t ev3_gyro_sensor_get_rate(int32_t);
+int32_t ev3_gyro_sensor_reset(int32_t);
+int32_t ev3_touch_sensor_is_pressed(int32_t);
+int32_t ev3_ultrasonic_sensor_get_distance(int32_t);
+int32_t ev3_ultrasonic_sensor_listen(int32_t);
+/* balancer.c */
+void balance_init(void);
+void balance_control(float, float, float, float, float, float, float,
+  signed char*, signed char*);
 
 #endif /* _EV3IF_H */

@@ -24,7 +24,7 @@ mrb_sensor_init(mrb_state *mrb, mrb_value self, mrb_int type)
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@port"), portv);
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@type"), mrb_fixnum_value(type));
 
-  EV3_sensor_config(mrb_fixnum(portv), type);
+  ev3_sensor_config(mrb_fixnum(portv), type);
 
   return self;
 }
@@ -63,7 +63,7 @@ mrb_color_sensor_get_ambient(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_color_sensor_get_ambient(port));
+  return mrb_fixnum_value(ev3_color_sensor_get_ambient(port));
 }
 
 /*
@@ -87,7 +87,7 @@ mrb_color_sensor_get_color(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_color_sensor_get_color(port));
+  return mrb_fixnum_value(ev3_color_sensor_get_color(port));
 }
 
 /*
@@ -103,14 +103,14 @@ mrb_color_sensor_get_reflect(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_color_sensor_get_reflect(port));
+  return mrb_fixnum_value(ev3_color_sensor_get_reflect(port));
 }
 
 static inline mrb_value
 mrb_color_sensor_judge_color(mrb_state *mrb, mrb_value self, mrb_int color)
 {
   mrb_int port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_bool_value(EV3_color_sensor_get_color(port) == color);
+  return mrb_bool_value(ev3_color_sensor_get_color(port) == color);
 }
 
 /*
@@ -246,7 +246,7 @@ mrb_gyro_sensor_get_angle(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_gyro_sensor_get_angle(port));
+  return mrb_fixnum_value(ev3_gyro_sensor_get_angle(port));
 }
 
 /*
@@ -262,7 +262,7 @@ mrb_gyro_sensor_get_rate(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_gyro_sensor_get_rate(port));
+  return mrb_fixnum_value(ev3_gyro_sensor_get_rate(port));
 }
 
 /*
@@ -278,7 +278,7 @@ mrb_gyro_sensor_reset(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  EV3_gyro_sensor_reset(port);
+  ev3_gyro_sensor_reset(port);
   return mrb_nil_value();
 }
 
@@ -301,7 +301,7 @@ mrb_gyro_sensor_calibrate(mrb_state *mrb, mrb_value self)
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
 
   for (i = 0; i < 200; i++) {
-    gyro = EV3_gyro_sensor_get_rate(port);
+    gyro = ev3_gyro_sensor_get_rate(port);
     gsum += gyro;
     if (gyro > gmax) gmax = gyro;
     if (gyro < gmin) gmin = gyro;
@@ -366,7 +366,7 @@ mrb_touch_sensor_is_pressed(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_bool_value(EV3_touch_sensor_is_pressed(port));
+  return mrb_bool_value(ev3_touch_sensor_is_pressed(port));
 }
 
 /*
@@ -403,7 +403,7 @@ mrb_ultrasonic_sensor_get_distance(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_ultrasonic_sensor_get_distance(port));
+  return mrb_fixnum_value(ev3_ultrasonic_sensor_get_distance(port));
 }
 
 /*
@@ -419,7 +419,7 @@ mrb_ultrasonic_sensor_listen(mrb_state *mrb, mrb_value self)
 {
   mrb_int port;
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_bool_value(EV3_ultrasonic_sensor_listen(port));
+  return mrb_bool_value(ev3_ultrasonic_sensor_listen(port));
 }
 
 void

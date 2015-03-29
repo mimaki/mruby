@@ -51,7 +51,7 @@ mrb_motor_init(mrb_state *mrb, mrb_value self)
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@port"), portv);
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@type"), typev);
 
-  EV3_motor_config(mrb_fixnum(portv), mrb_fixnum(typev));
+  ev3_motor_config(mrb_fixnum(portv), mrb_fixnum(typev));
 
   return self;
 }
@@ -80,7 +80,7 @@ mrb_motor_set_power(mrb_state *mrb, mrb_value self)
   else if (v < EV3_MOTOR_BMAX) v = EV3_MOTOR_BMAX;
 
   port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  EV3_motor_set_power(port, v);
+  ev3_motor_set_power(port, v);
 
   return mrb_fixnum_value(v);
 }
@@ -97,7 +97,7 @@ static mrb_value
 mrb_motor_get_power(mrb_state *mrb, mrb_value self)
 {
   mrb_int port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_motor_get_power(port));
+  return mrb_fixnum_value(ev3_motor_get_power(port));
 }
 
 /*
@@ -120,7 +120,7 @@ mrb_motor_stop(mrb_state *mrb, mrb_value self)
   mrb_bool brake = FALSE;
 
   mrb_get_args(mrb, "|b", &brake);
-  EV3_motor_stop(port, brake ? TRUE : FALSE);
+  ev3_motor_stop(port, brake ? TRUE : FALSE);
   return mrb_nil_value();
 }
 
@@ -149,7 +149,7 @@ mrb_motor_rotate(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "ii|i", &deg, &spd, &blk);
   spd = (spd < 0) ? 0 : (spd > 100) ? 100 : spd;
-  EV3_motor_rotate(port, deg, spd, blk);
+  ev3_motor_rotate(port, deg, spd, blk);
   return mrb_nil_value();
 }
 
@@ -165,7 +165,7 @@ static mrb_value
 mrb_motor_get_count(mrb_state *mrb, mrb_value self)
 {
   mrb_int port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  return mrb_fixnum_value(EV3_motor_get_count(port));
+  return mrb_fixnum_value(ev3_motor_get_counts(port));
 }
 
 /*
@@ -180,7 +180,7 @@ static mrb_value
 mrb_motor_reset_count(mrb_state *mrb, mrb_value self)
 {
   mrb_int port = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port")));
-  EV3_motor_reset_count(port);
+  ev3_motor_reset_counts(port);
   return mrb_nil_value();
 }
 

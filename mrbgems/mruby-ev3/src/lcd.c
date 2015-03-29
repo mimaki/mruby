@@ -58,7 +58,7 @@ mrb_lcd_init(mrb_state *mrb, mrb_value self)
   fonti = mrb_fixnum(fontv);
   if (_font_size[fonti].w == 0) {
     /* initialize font size at 1st time */
-    EV3_font_get_size(fonti, &_font_size[fonti].w, &_font_size[fonti].h);
+    ev3_font_get_size(fonti, &_font_size[fonti].w, &_font_size[fonti].h);
   }
 
   colv = mrb_hash_get(mrb, cmap, mrb_symbol_value(col));
@@ -105,7 +105,7 @@ mrb_lcd_set_font(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid font size :%S", mrb_sym2str(mrb, font));
   }
 
-  EV3_lcd_set_font(mrb_fixnum(fontv));
+  ev3_lcd_set_font(mrb_fixnum(fontv));
   mrb_cv_set(mrb, self, mrb_intern_lit(mrb, "@@font"), fontv);
 
   return mrb_nil_value();
@@ -115,7 +115,7 @@ static void
 mrb_lcd_get_font_size(mrb_state *mrb, mrb_value lcd, mrb_int *fw, mrb_int *fh)
 {
   mrb_value font = mrb_cv_get(mrb, lcd, mrb_intern_lit(mrb, "@@font"));
-  EV3_font_get_size(mrb_fixnum(font), fw, fh);
+  ev3_font_get_size(mrb_fixnum(font), fw, fh);
 }
 
 static void
@@ -127,7 +127,7 @@ ev3_set_current_font(mrb_state *mrb, mrb_value self)
   mrb_int target  = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@font")));
 
   if (first || current != target) {
-    EV3_lcd_set_font((uint16_t)target);
+    ev3_lcd_set_font((uint16_t)target);
     mrb_cv_set(mrb, mrb_obj_value(lcd), mrb_intern_lit(mrb, "@@font"), mrb_fixnum_value(target));
     first = FALSE;
   }
@@ -152,7 +152,7 @@ mrb_lcd_lf(mrb_state *mrb, mrb_value lcd)
   mrb_int ch = sh / f->h;
 
 #ifdef EV3
-  EV3_lcd_fill_rect(x0+cx*f->w, y0+cy*f->h, sw-cx*f->w, f->h, fc ? 0 : 1);
+  ev3_lcd_fill_rect(x0+cx*f->w, y0+cy*f->h, sw-cx*f->w, f->h, fc ? 0 : 1);
 #else
   MRBEV3_PUTS("");
 #endif
@@ -205,11 +205,11 @@ mrb_lcd_print_line(mrb_state *mrb, mrb_value lcd, mrb_value *str)
     }
     if (lf) {
       *dst = '\0';
-      EV3_lcd_draw_string(buf, x0+cx*f->w, y0+cy*f->h);
+      ev3_lcd_draw_string(buf, x0+cx*f->w, y0+cy*f->h);
 
       /* line feed */
 #ifdef EV3
-      EV3_lcd_fill_rect(x0+csr*f->w, y0+cy*f->h, sw-csr*f->w, f->h, fc ? 0 : 1);
+      ev3_lcd_fill_rect(x0+csr*f->w, y0+cy*f->h, sw-csr*f->w, f->h, fc ? 0 : 1);
 #else
       MRBEV3_PUTS("");
 #endif
@@ -222,7 +222,7 @@ mrb_lcd_print_line(mrb_state *mrb, mrb_value lcd, mrb_value *str)
   }
   *dst = '\0';
   if (dst != buf) {
-    EV3_lcd_draw_string(buf, x0+cx*f->w, y0+cy*f->h);
+    ev3_lcd_draw_string(buf, x0+cx*f->w, y0+cy*f->h);
   }
 
   mrb_free(mrb, buf);
@@ -333,7 +333,7 @@ mrb_lcd_draw_string(mrb_state *mrb, mrb_value self)
     str = mrb_funcall(mrb, obj, "to_s", 0);
   }
 
-  EV3_lcd_draw_string(mrb_string_value_cstr(mrb, &str), x*cw, y*ch);
+  ev3_lcd_draw_string(mrb_string_value_cstr(mrb, &str), x*cw, y*ch);
 
   return mrb_nil_value();
 }
@@ -398,7 +398,7 @@ mrb_lcd_clear(mrb_state *mrb, mrb_value self)
   y = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@top")));
   w = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@width")));
   h = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@height")));
-  EV3_lcd_fill_rect(x, y, w, h, mrb_fixnum(colv) ? 0 : 1);
+  ev3_lcd_fill_rect(x, y, w, h, mrb_fixnum(colv) ? 0 : 1);
 
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(0));
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value(0));
