@@ -60,7 +60,7 @@ mrb_balance_control(mrb_state *mrb, mrb_value self)
 }
 
 void
-mrb_mruby_ev3_gem_init(mrb_state *mrb)
+mrb_mruby_ev3rt_gem_init(mrb_state *mrb)
 {
   struct RClass *ev3;
   struct RClass *dev;
@@ -69,8 +69,8 @@ mrb_mruby_ev3_gem_init(mrb_state *mrb)
   /* RTOS module */
   mrb_rtos_init(mrb);
 
-  /* EV3 module */
-  ev3 = mrb_define_module(mrb, "EV3");
+  /* EV3RT module */
+  ev3 = mrb_define_module(mrb, "EV3RT");
 
   /* EV3 parts */
   mrb_ev3_lcd_init(mrb, ev3);     /* LCD */
@@ -95,12 +95,9 @@ mrb_mruby_ev3_gem_init(mrb_state *mrb)
 #ifndef EV3
   mrb_gv_set(mrb, mrb_intern_lit(mrb, "$ev3_host"), mrb_true_value());
 #endif
-
-  /* Object includes EV3 */
-  mrb_include_module(mrb, mrb->object_class, ev3);
 }
 
 void
-mrb_mruby_ev3_gem_final(mrb_state *mrb)
+mrb_mruby_ev3rt_gem_final(mrb_state *mrb)
 {
 }

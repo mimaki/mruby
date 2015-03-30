@@ -125,12 +125,12 @@ end
 # end
 
 # Difine arm-none-eabi build settings
-MRuby::CrossBuild.new('arm-ev3') do |conf|
+MRuby::CrossBuild.new('arm-ev3rt') do |conf|
   toolchain :gccarm
 
   conf.build_mrbtest_lib_only
 
-  conf.gembox 'arm-ev3'
+  conf.gembox 'arm-ev3rt'
 
   conf.cc.defines = %w(EV3)
 

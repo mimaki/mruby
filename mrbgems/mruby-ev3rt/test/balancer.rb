@@ -1,29 +1,25 @@
-# Balancer class
+# EV3RT::Balancer class
 
 assert('Balancer', "class") do
-  Balancer.class == Class
-end
-
-assert('Balancer', 'include?(EV3)') do
-  Balancer.include?(EV3)
+  EV3RT::Balancer.class == Class
 end
 
 assert('Balancer', 'new') do
-  Balancer.new
+  EV3RT::Balancer.new
 end
 
 assert('Balancer', 'reset') do
-  Balancer.new.reset
+  EV3RT::Balancer.new.reset
 end
 
 assert('Balancer', "control") do
-  pwm = Balancer.new.control(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0)
+  pwm = EV3RT::Balancer.new.control(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0)
   pwm.class == Array &&
   pwm.size == 2
 end
 
 assert('Balancer', "control: parameter error") do
-  bal = Balancer.new
+  bal = EV3RT::Balancer.new
   eary = []
   begin
     bal.control

@@ -1,33 +1,29 @@
-# Sound class
+# EV3RT::Sound class
 
 assert('Sound', "class") do
-  Sound.class == Class
-end
-
-assert('Sound', 'include?(EV3)') do
-  Sound.include?(EV3)
+  EV3RT::Sound.class == Class
 end
 
 assert('Sound', 'TONE') do
-  Sound.const_defined?(:TONE) #&&
-  Sound::TONE[:c4]
+  EV3RT::Sound.const_defined?(:TONE) #&&
+  EV3RT::Sound::TONE[:c4]
 end
 
 assert('Sound', 'tone') do
-  Sound.tone(0,    0) == nil &&
-  Sound.tone(0.0,  0) == nil &&
-  Sound.tone(:d4,  0) == nil &&
-  Sound.tone("d5", 0) == nil
+  EV3RT::Sound.tone(0,    0) == nil &&
+  EV3RT::Sound.tone(0.0,  0) == nil &&
+  EV3RT::Sound.tone(:d4,  0) == nil &&
+  EV3RT::Sound.tone("d5", 0) == nil
 end
 
 assert('Sound', 'tone: parameter error') do
   e1 = e2 = nil
   begin
-    Sound.tone
+    EV3RT::Sound.tone
   rescue => e1
   end
   begin
-    Sound.tone(1)
+    EV3RT::Sound.tone(1)
   rescue => e2
   end
   e1 && e2
@@ -36,7 +32,7 @@ end
 assert('Sound', 'tone: Unknown tone') do
   e = nil
   begin
-    Sound.tone(:unknown, 0)
+    EV3RT::Sound.tone(:unknown, 0)
   rescue => e
   end
   e.class == ArgumentError
@@ -45,9 +41,9 @@ end
 assert('Sound', 'volume=') do
   e = nil
   begin
-    Sound.volume = 0
-    Sound.volume = 100
-    Sound.volume = 101
+    EV3RT::Sound.volume = 0
+    EV3RT::Sound.volume = 100
+    EV3RT::Sound.volume = 101
   rescue => e
   end
   !e
@@ -56,7 +52,7 @@ end
 assert('Sound', 'stop') do
   e = nil
   begin
-    Sound.stop
+    EV3RT::Sound.stop
   rescue => e
   end
   !e

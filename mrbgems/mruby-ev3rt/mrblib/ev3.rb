@@ -1,4 +1,4 @@
-module EV3
+module EV3RT
   class LCD
     attr_reader :cx
     attr_reader :cy
