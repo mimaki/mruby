@@ -71,6 +71,9 @@ MRuby::GemBox.new do |conf|
   # Use extensional Kernel module
   conf.gem :core => "mruby-kernel-ext"
 
-  # Use EV3RT libraries
+  # Use TOPPERS libraries
+  conf.gem :core => "mruby-rtos-toppers"
+
+    # Use EV3RT libraries
   conf.gem :core => "mruby-ev3rt"
 end

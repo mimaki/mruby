@@ -5,7 +5,6 @@
 #include "mruby/array.h"
 #include "ev3if.h"
 
-extern void mrb_rtos_init(mrb_state*);
 extern void mrb_ev3_lcd_init(mrb_state*, struct RClass*);
 extern void mrb_ev3_led_init(mrb_state*, struct RClass*);
 extern void mrb_ev3_button_init(mrb_state*, struct RClass*);
@@ -65,9 +64,6 @@ mrb_mruby_ev3rt_gem_init(mrb_state *mrb)
   struct RClass *ev3;
   struct RClass *dev;
   struct RClass *bal;
-
-  /* RTOS module */
-  mrb_rtos_init(mrb);
 
   /* EV3RT module */
   ev3 = mrb_define_module(mrb, "EV3RT");

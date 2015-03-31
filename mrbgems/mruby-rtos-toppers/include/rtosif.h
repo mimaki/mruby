@@ -10,14 +10,19 @@
   #define MRBROTS_PUTS(x)
 #endif
 
+typedef int ER;
+typedef int ID;
+typedef int TMO;
+typedef unsigned long SYSTIM;
+
 /* RTOS */
-int32_t RTOS_delay(int32_t);
-int32_t RTOS_millis(void);
+ER RTOS_tslp_tsk(TMO);
+ER RTOS_get_tim(SYSTIM*);
 
 /* Task */
-int32_t RTOS_act_tsk(int32_t);
-int32_t RTOS_sus_tsk(int32_t);
-int32_t RTOS_rsm_tsk(int32_t);
-int32_t RTOS_ter_tsk(int32_t);
+ER RTOS_act_tsk(ID);
+ER RTOS_sus_tsk(ID);
+ER RTOS_rsm_tsk(ID);
+ER RTOS_ter_tsk(ID);
 
 #endif /* _RTOSIF_H */

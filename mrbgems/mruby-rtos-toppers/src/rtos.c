@@ -18,7 +18,7 @@ mrb_rtos_delay(mrb_state *mrb, mrb_value self)
 {
   mrb_int t;
   mrb_get_args(mrb, "i", &t);
-  RTOS_delay(t);
+  RTOS_tslp_tsk(t);
   return mrb_nil_value();
 }
 
@@ -33,7 +33,9 @@ mrb_rtos_delay(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_rtos_millis(mrb_state *mrb, mrb_value self)
 {
-  return mrb_fixnum_value(RTOS_millis());
+  SYSTIM st;
+  RTOS_get_tim(&st);
+  return mrb_fixnum_value((mrb_int)st);
 }
 
 /*
@@ -119,7 +121,7 @@ mrb_task_terminate(mrb_state *mrb, mrb_value self)
 
 
 void
-mrb_rtos_init(mrb_state *mrb)
+mrb_mruby_rtos_toppers_gem_init(mrb_state *mrb)
 {
   struct RClass *rtos;
   struct RClass *tsk;
@@ -128,8 +130,8 @@ mrb_rtos_init(mrb_state *mrb)
   rtos = mrb_define_module(mrb, "RTOS");
 
   /* RTOS api */
-  mrb_define_method(mrb, rtos, "delay",  mrb_rtos_delay,   MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, rtos, "millis", mrb_rtos_millis,  MRB_ARGS_NONE());
+  mrb_define_module_function(mrb, rtos, "delay",  mrb_rtos_delay,   MRB_ARGS_REQ(1));
+  mrb_define_module_function(mrb, rtos, "millis", mrb_rtos_millis,  MRB_ARGS_NONE());
 
   /* Task class */
   tsk = mrb_define_class_under(mrb, rtos, "Task", mrb->object_class);
@@ -139,7 +141,9 @@ mrb_rtos_init(mrb_state *mrb)
   mrb_define_method(mrb, tsk, "suspend",    mrb_task_suspend,   MRB_ARGS_NONE());
   mrb_define_method(mrb, tsk, "resume",     mrb_task_resume,    MRB_ARGS_NONE());
   mrb_define_method(mrb, tsk, "terminate",  mrb_task_terminate, MRB_ARGS_NONE());
+}
 
-  /* Object includes RTOS */
-  mrb_include_module(mrb, mrb->object_class, rtos);
+void
+mrb_mruby_rtos_toppers_gem_final(mrb_state *mrb)
+{
 }
