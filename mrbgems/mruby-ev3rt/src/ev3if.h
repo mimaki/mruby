@@ -1,6 +1,8 @@
 #ifndef _EV3IF_H
 #define _EV3IF_H
 
+#include <stdio.h>
+
 #define EV3_LCD_WIDTH   178
 #define EV3_LCD_HEIGHT  128
 
@@ -73,6 +75,24 @@
 
 typedef void (*ISR)(intptr_t);
 
+typedef struct {
+	void*    buffer;   //!< \~English Pointer of the buffer where this file is stored. NULL means a invalid memory file. \~Japanese このファイルが格納されているバッファへのポインタ．NULLは無効なメモリファイル．
+	uint32_t filesz;   //!< \~English Actual size of this file	 					                                     \~Japanese ファイルの実際のサイズ
+	uint32_t buffersz; //!< \~English Maximum size of the buffer to store this file   									 \~Japanese バッファの最大サイズ
+} memfile_t;
+
+#define	TMAX_FILENAME_LEN (255)    //!< \~English Maximum length of a file name \~Japanese ファイル名の最大の長さ
+
+typedef struct {
+	uint32_t size;							//!< \~English File size          \~Japanese ファイルのサイズ
+	uint16_t date;							//!< \~English Last modified date \~Japanese ファイルのLast modified date
+	uint16_t time;							//!< \~English Last modified time \~Japanese ファイルのLast modified time
+  int is_dir;                        //!< \~English Flag of a folder   \~Japanese フォルダであることを表すフラグ
+  int is_readonly;                   //!< \~English Flag of read-only  \~Japanese 読み出し専用であることを表すフラグ
+  int is_hidden;                     //!< \~English Flag of hidden     \~Japanese 隠しファイルであることを表すフラグ
+	char	 name[TMAX_FILENAME_LEN + 1];	//!< \~English File name          \~Japanese ファイル名
+} fileinfo_t;
+
 typedef enum {
     LEFT_BUTTON  = 0, //!< \~English Left button       \~Japanese 左ボタン
     RIGHT_BUTTON = 1, //!< \~English Right button    \~Japanese 右ボタン
@@ -135,6 +155,12 @@ typedef enum {
     TNUM_COLOR      //!< \~English Number of colors \~Japanese 識別できるカラーの数
 } colorid_t;
 
+typedef enum {
+    EV3_SERIAL_DEFAULT = 0, //!< \~English Default SIO port     \~Japanese デフォルトのシリアルポート（ログタスク用ポート）
+    EV3_SERIAL_UART = 1,	//!< \~English UART (Sensor port 1) \~Japanese UARTポート（センサポート1）
+    EV3_SERIAL_BT = 2,	    //!< \~English Bluetooth SPP        \~Japanese Bluetooth仮想シリアルポート
+} serial_port_t;
+
 /* LCD */
 int32_t ev3_lcd_set_font(int32_t);
 int32_t ev3_font_get_size(int32_t, int32_t*, int32_t*);
@@ -151,6 +177,7 @@ int32_t ev3_led_set_color(int32_t);
 /* Sound */
 int32_t ev3_speaker_play_tone(uint16_t, int32_t);
 int32_t ev3_speaker_set_volume(uint8_t);
+int32_t ev3_speaker_play_file(const memfile_t*, int32_t);
 int32_t ev3_speaker_stop(void);
 /* Motor */
 int32_t ev3_motor_config(int32_t, int32_t);
@@ -171,6 +198,13 @@ int32_t ev3_gyro_sensor_reset(int32_t);
 int32_t ev3_touch_sensor_is_pressed(int32_t);
 int32_t ev3_ultrasonic_sensor_get_distance(int32_t);
 int32_t ev3_ultrasonic_sensor_listen(int32_t);
+/* File System */
+int32_t ev3_sdcard_opendir(const char*);
+int32_t ev3_sdcard_readdir(int32_t, fileinfo_t*);
+int32_t ev3_sdcard_closedir(int32_t);
+int32_t ev3_memfile_load(const char*, memfile_t*);
+int32_t ev3_memfile_free(memfile_t*);
+FILE* ev3_serial_open_file(serial_port_t);
 /* balancer.c */
 void balance_init(void);
 void balance_control(float, float, float, float, float, float, float,

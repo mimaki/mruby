@@ -149,6 +149,12 @@ ev3_speaker_set_volume(uint8_t vol)
 }
 
 int32_t
+ev3_speaker_play_file(const memfile_t *p_memfile, int32_t duration)
+{
+  return 0;
+}
+
+int32_t
 ev3_speaker_stop(void)
 {
   return 0;
@@ -206,6 +212,42 @@ int32_t
 ev3_ultrasonic_sensor_get_distance(int32_t port)
 {
   return 0;
+}
+
+int32_t
+ev3_sdcard_opendir(const char *path)
+{
+  return 0;
+}
+
+int32_t
+ev3_sdcard_readdir(int32_t dirid, fileinfo_t *p_fileinfo)
+{
+  return 0;
+}
+
+int32_t
+ev3_sdcard_closedir(int32_t dirid)
+{
+  return 0;
+}
+
+int32_t
+ev3_memfile_load(const char *path, memfile_t *p_memfile)
+{
+  return 0;
+}
+
+int32_t
+ev3_memfile_free(memfile_t *p_memfile)
+{
+  return 0;
+}
+
+FILE *
+ev3_serial_open_file(serial_port_t port)
+{
+  return NULL;
 }
 
 int32_t
