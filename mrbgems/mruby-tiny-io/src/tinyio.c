@@ -50,6 +50,13 @@ const static struct mrb_data_type mrb_file_type = {"File", mrb_file_free};
 //   return mrb_fixnum_value(len);
 // }
 
+MRB_API void
+mrb_file_attach(mrb_value self, FILE *fp)
+{
+  DATA_TYPE(self) = &mrb_file_type;
+  DATA_PTR(self) = fp;
+}
+
 /*
  *  call-seq:
  *     File.new(path, mode='r')  # => File
@@ -74,15 +81,17 @@ mrb_file_init(mrb_state *mrb, mrb_value self)
   char *name;
   char *mode = "r";
   mrb_int perm = 0666;
+  FILE *fp;
 
   mrb_get_args(mrb, "z|zi", &name, &mode, &perm);
 
-  DATA_TYPE(self) = &mrb_file_type;
-  DATA_PTR(self) = fopen(name, mode);
-
-  if (!DATA_PTR(self)) {
+  // DATA_TYPE(self) = &mrb_file_type;
+  // DATA_PTR(self) = fopen(name, mode);
+  fp = fopen(name, mode);
+  if (fp == NULL) {
     mrb_raisef(mrb, E_IO_ERROR, "File cannot open. (%S)", mrb_str_new_cstr(mrb, name));
   }
+  mrb_file_attach(self, fp);
 
   return self;
 }

@@ -1,6 +1,6 @@
 class File < IO
   def self.open(*args, &block)
-    f = File.new(*args)
+    f = self.new(*args)
 
     return f unless block
 

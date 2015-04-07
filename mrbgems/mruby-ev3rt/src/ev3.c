@@ -12,6 +12,7 @@ extern void mrb_ev3_sound_init(mrb_state*, struct RClass*);
 extern void mrb_ev3_battery_init(mrb_state*, struct RClass*);
 extern void mrb_ev3_motor_init(mrb_state*, struct RClass*, struct RClass*);
 extern void mrb_ev3_sensor_init(mrb_state*, struct RClass*, struct RClass*);
+extern void mrb_ev3_serial_init(mrb_state*, struct RClass*);
 
 
 /*
@@ -74,6 +75,7 @@ mrb_mruby_ev3rt_gem_init(mrb_state *mrb)
   mrb_ev3_button_init(mrb, ev3);  /* Button */
   mrb_ev3_sound_init(mrb, ev3);   /* Sound */
   mrb_ev3_battery_init(mrb, ev3); /* Battery */
+  mrb_ev3_serial_init(mrb, ev3);  /* SerialPort */
 
   /* EV3 Devices */
   dev = mrb_define_class_under(mrb, ev3, "Device", mrb->object_class);

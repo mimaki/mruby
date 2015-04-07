@@ -247,6 +247,12 @@ ev3_memfile_free(memfile_t *p_memfile)
 FILE *
 ev3_serial_open_file(serial_port_t port)
 {
+  switch(port) {
+  case EV3_SERIAL_DEFAULT:  return fopen("./port0", "r+");
+  case EV3_SERIAL_UART:     return fopen("./port1", "r+");
+  case EV3_SERIAL_BT:       return fopen("./port2", "r+");
+  default:                  break;
+  }
   return NULL;
 }
 
