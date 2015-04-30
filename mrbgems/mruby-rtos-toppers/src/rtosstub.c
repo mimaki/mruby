@@ -40,4 +40,42 @@ RTOS_ter_tsk(ID id)
 {
   return 0;
 }
+
+ER
+RTOS_acre_flg(T_CFLG *pk_cflg)
+{
+  return 0;
+}
+
+ER
+RTOS_set_flg(ID id, FLGPTN ptn)
+{
+  return ptn;
+}
+
+ER
+RTOS_wai_flg(ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn)
+{
+  *p_flgptn = waiptn;
+  return 0;
+}
+
+ER
+RTOS_pol_flg(ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn)
+{
+  *p_flgptn = waiptn;
+  return 0;
+}
+
+ER RTOS_twai_flg(ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn, TMO tmout)
+{
+  *p_flgptn = waiptn;
+  return 0;
+}
+
+ER RTOS_clr_flg(ID id, FLGPTN clrptn)
+{
+  return 0;
+}
+
 #endif

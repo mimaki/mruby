@@ -244,13 +244,23 @@ ev3_memfile_free(memfile_t *p_memfile)
   return 0;
 }
 
+static FILE *
+__fopen(const char *path)
+{
+  FILE *fp = fopen(path, "r+");
+  if (fp == NULL) {
+    fp = fopen(path, "w+");
+  }
+  return fp;
+}
+
 FILE *
 ev3_serial_open_file(serial_port_t port)
 {
   switch(port) {
-  case EV3_SERIAL_DEFAULT:  return fopen("./port0", "r+");
-  case EV3_SERIAL_UART:     return fopen("./port1", "r+");
-  case EV3_SERIAL_BT:       return fopen("./port2", "r+");
+  case EV3_SERIAL_DEFAULT:  return __fopen("./port0");
+  case EV3_SERIAL_UART:     return __fopen("./port1");
+  case EV3_SERIAL_BT:       return __fopen("./port2");
   default:                  break;
   }
   return NULL;
