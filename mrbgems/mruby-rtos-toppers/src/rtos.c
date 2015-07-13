@@ -5,6 +5,8 @@
 #include "mruby/hash.h"
 #include "rtosif.h"
 
+/* initialize functions */
+extern void mrb_rtos_memory_init(mrb_state*, struct RClass*);
 
 /*
  *  call-seq:
@@ -227,8 +229,7 @@ mrb_flag_set(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_flag_wait(mrb_state *mrb, mrb_value self)
 {
-  struct RClass *flg = mrb_obj_class(mrb, self);
-  mrb_value tmap = mrb_const_get(mrb, mrb_obj_value(flg), mrb_intern_lit(mrb, "TIMEOUT"));
+  mrb_value tmap = mrb_mod_cv_get(mrb, mrb_module_get(mrb, "RTOS"), mrb_intern_lit(mrb, "TIMEOUT"));
   mrb_int id = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@id")));
   mrb_int waiptn = 1;
   mrb_sym mds = mrb_intern_lit(mrb, "and");
@@ -277,6 +278,7 @@ mrb_flag_clear(mrb_state *mrb, mrb_value self)
   return mrb_nil_value();
 }
 
+
 void
 mrb_mruby_rtos_toppers_gem_init(mrb_state *mrb)
 {
@@ -294,6 +296,18 @@ mrb_mruby_rtos_toppers_gem_init(mrb_state *mrb)
   /* RTOS api */
   mrb_define_module_function(mrb, rtos, "delay",  mrb_rtos_delay,   MRB_ARGS_REQ(1));
   mrb_define_module_function(mrb, rtos, "millis", mrb_rtos_millis,  MRB_ARGS_NONE());
+
+  wmd = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, wmd, mrb_symbol_value(mrb_intern_lit(mrb, "and")),   mrb_fixnum_value(TWF_ANDW));
+  mrb_hash_set(mrb, wmd, mrb_symbol_value(mrb_intern_lit(mrb, "or")),    mrb_fixnum_value(TWF_ORW));
+  // mrb_const_set(mrb, flgo, mrb_intern_lit(mrb, "WAITMODE"), wmd);
+  mrb_mod_cv_set(mrb, rtos, mrb_intern_lit(mrb, "WAITMODE"), wmd);
+
+  tmo = mrb_hash_new(mrb);
+  mrb_hash_set(mrb, tmo, mrb_symbol_value(mrb_intern_lit(mrb, "polling")), mrb_fixnum_value(TMO_POL));
+  mrb_hash_set(mrb, tmo, mrb_symbol_value(mrb_intern_lit(mrb, "forever")), mrb_fixnum_value(TMO_FEVR));
+  // mrb_const_set(mrb, flgo, mrb_intern_lit(mrb, "TIMEOUT"), tmo);
+  mrb_mod_cv_set(mrb, rtos, mrb_intern_lit(mrb, "TIMEOUT"), tmo);
 
   /* Task class */
   tsk = mrb_define_class_under(mrb, rtos, "Task", mrb->object_class);
@@ -317,20 +331,13 @@ mrb_mruby_rtos_toppers_gem_init(mrb_state *mrb)
   mrb_hash_set(mrb, atr, mrb_symbol_value(mrb_intern_lit(mrb, "multiple")), mrb_fixnum_value(TA_WMUL));
   mrb_const_set(mrb, flgo, mrb_intern_lit(mrb, "ATTRIBUTE"), atr);
 
-  wmd = mrb_hash_new(mrb);
-  mrb_hash_set(mrb, wmd, mrb_symbol_value(mrb_intern_lit(mrb, "and")),   mrb_fixnum_value(TWF_ANDW));
-  mrb_hash_set(mrb, wmd, mrb_symbol_value(mrb_intern_lit(mrb, "or")),    mrb_fixnum_value(TWF_ORW));
-  mrb_const_set(mrb, flgo, mrb_intern_lit(mrb, "WAITMODE"), wmd);
-
-  tmo = mrb_hash_new(mrb);
-  mrb_hash_set(mrb, tmo, mrb_symbol_value(mrb_intern_lit(mrb, "polling")), mrb_fixnum_value(TMO_POL));
-  mrb_hash_set(mrb, tmo, mrb_symbol_value(mrb_intern_lit(mrb, "forever")), mrb_fixnum_value(TMO_FEVR));
-  mrb_const_set(mrb, flgo, mrb_intern_lit(mrb, "TIMEOUT"), tmo);
-
   mrb_define_method(mrb, flg, "initialize", mrb_flag_init,      MRB_ARGS_ANY());
   mrb_define_method(mrb, flg, "set",        mrb_flag_set,       MRB_ARGS_OPT(1));
   mrb_define_method(mrb, flg, "wait",       mrb_flag_wait,      MRB_ARGS_OPT(3));
   mrb_define_method(mrb, flg, "clear",      mrb_flag_clear,     MRB_ARGS_OPT(1));
+
+  /* MemoryPool, MemoryBuffer */
+  mrb_rtos_memory_init(mrb, rtos);
 }
 
 void

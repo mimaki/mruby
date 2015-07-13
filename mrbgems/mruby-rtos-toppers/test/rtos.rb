@@ -34,3 +34,13 @@ end
 assert('RTOS', 'millis') do
   RTOS::millis
 end
+
+assert('RTOS', 'WAITMODE') do
+  mode = RTOS::WAITMODE
+  mode && mode[:and] && mode[:or]
+end
+
+assert('RTOS', 'TIMEOUT') do
+  tmo = RTOS::TIMEOUT
+  tmo && tmo[:polling] && tmo[:forever]
+end

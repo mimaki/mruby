@@ -20,16 +20,16 @@ assert('EvetnFlag', 'ATTRIBUTE') do
   atr[:single] && atr[:multiple]
 end
 
-assert('EventFlag', 'WAITMODE') do
-  mode = RTOS::EventFlag::WAITMODE
-  mode && mode[:and] && mode[:or]
-end
+# assert('EventFlag', 'WAITMODE') do
+#   mode = RTOS::EventFlag::WAITMODE
+#   mode && mode[:and] && mode[:or]
+# end
 
-assert('EventFlag', 'TIMEOUT') do
-  tmo = RTOS::EventFlag::TIMEOUT
-  tmo && tmo[:polling] && tmo[:forever]
-end
-
+# assert('EventFlag', 'TIMEOUT') do
+#   tmo = RTOS::EventFlag::TIMEOUT
+#   tmo && tmo[:polling] && tmo[:forever]
+# end
+#
 assert('EventFlag', 'set') do
   RTOS::EventFlag.new.set == 1 &&
   RTOS::EventFlag.new.set(0xf) == 0xf

@@ -36,11 +36,20 @@ typedef unsigned int MODE;
 typedef unsigned int ATR;
 typedef unsigned int FLGPTN;
 typedef unsigned long SYSTIM;
+typedef void *VP;
 
 typedef struct t_cflg {
 	ATR		flgatr;
 	FLGPTN	iflgptn;
 } T_CFLG;
+
+typedef struct t_cmpf {
+	ATR mpfatr;
+	unsigned int blkcnt;
+	unsigned int blksz;
+	void *mpf;
+	void *mpfmb;
+} T_CMPF;
 
 /* RTOS */
 ER RTOS_tslp_tsk(TMO);
@@ -59,5 +68,12 @@ ER RTOS_wai_flg(ID, FLGPTN, MODE, FLGPTN*);
 ER RTOS_pol_flg(ID, FLGPTN, MODE, FLGPTN*);
 ER RTOS_twai_flg(ID, FLGPTN, MODE, FLGPTN*, TMO);
 ER RTOS_clr_flg(ID, FLGPTN);
+
+/* Fixed size memory pool */
+ER_ID RTOS_acre_mpf(const T_CMPF*);
+ER RTOS_get_mpf(ID, void**);
+ER RTOS_pget_mpf(ID, void**);
+ER RTOS_tget_mpf(ID, void**, TMO);
+ER RTOS_rel_mpf(ID, void*);
 
 #endif /* _RTOSIF_H */
