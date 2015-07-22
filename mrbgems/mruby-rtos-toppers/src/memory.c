@@ -284,7 +284,7 @@ mrb_rtos_memory_init(mrb_state *mrb, struct RClass *rtos)
   mpl = mrb_define_class_under(mrb, rtos, "MemoryPool", mrb->object_class);
   MRB_SET_INSTANCE_TT(mpl, MRB_TT_DATA);
 
-  mrb_define_method(mrb, mpl, "initialize", mrb_mpl_init,       MRB_ARGS_ARG(1, 1));
+  mrb_define_method(mrb, mpl, "initialize", mrb_mpl_init,       MRB_ARGS_OPT(3));
   mrb_define_method(mrb, mpl, "open",       mrb_mpl_open,       MRB_ARGS_REQ(2));
 
   /* MemoryBuffer class */

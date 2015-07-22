@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "rtosif.h"
+#include "mruby.h"
 
 #ifndef EV3
 
@@ -42,6 +43,28 @@ RTOS_ter_tsk(ID id)
   return 0;
 }
 
+/* Semaphore */
+ER_ID RTOS_acre_sem(mrb_state *mrb, T_CSEM *pcsem)
+{
+  return 0;
+}
+
+ER RTOS_sig_sem(mrb_state *mrb, ID id)
+{
+  return E_OK;
+}
+
+ER RTOS_wai_sem(mrb_state *mrb, ID id)
+{
+  return E_OK;
+}
+
+ER RTOS_pol_sem(mrb_state *mrb, ID id)
+{
+  return E_OK;
+}
+
+/* Event flag */
 ER
 RTOS_acre_flg(T_CFLG *pk_cflg)
 {
@@ -85,11 +108,12 @@ static ID gmpfid = 0;
 
 ER_ID RTOS_acre_mpf(const T_CMPF *pcmpf)
 {
-  if (gmpfid >= MAX_MPF) {
+  ID id = gmpfid++;
+  if (id >= MAX_MPF) {
     return -1;
   }
-  gcmpf[gmpfid++] = *pcmpf;
-  return 0;
+  gcmpf[id] = *pcmpf;
+  return id;
 }
 
 ER RTOS_get_mpf(ID id, void **pblk)
@@ -117,4 +141,72 @@ ER RTOS_rel_mpf(ID id, void *pblk)
   return 0;
 }
 
-#endif
+#define MAX_DTQ 16
+typedef struct mrb_dtq_t {
+  int wp;
+  int rp;
+  T_CDTQ dtq;
+} mrb_dtq_t;
+static mrb_dtq_t gcdtq[MAX_DTQ] = {{0}};
+static ID gdtqid = 0;
+
+ER_ID	RTOS_acre_dtq(mrb_state *mrb, const T_CDTQ *pcdtq)
+{
+  ID id = gdtqid++;
+  if (id >= MAX_DTQ) {
+    return E_ID;
+  }
+  gcdtq[id].wp = 0;
+  gcdtq[id].rp = 0;
+  gcdtq[id].dtq = *pcdtq;
+  return id;
+}
+
+ER RTOS_snd_dtq(mrb_state *mrb, ID id, intptr_t data, TMO tmout/*not use*/)
+{
+  if (id >= MAX_DTQ) {
+    return E_ID;
+  }
+  ((intptr_t*)gcdtq[id].dtq.dtqmb)[gcdtq[id].wp] = data;
+  gcdtq[id].wp = (gcdtq[id].wp + 1) % gcdtq[id].dtq.dtqcnt;
+// {
+//   int i;
+//   for (i=gcdtq[id].rp; i<gcdtq[id].wp; i++) {
+//     printf("%016lx,", ((intptr_t*)gcdtq[id].dtq.dtqmb)[i]);
+//   }
+//   printf("\n");
+// }
+  return 0;
+}
+
+ER RTOS_psnd_dtq(mrb_state *mrb, ID id, intptr_t data, TMO tmout/*not use*/)
+{
+  return RTOS_snd_dtq(mrb, id, data, tmout);
+}
+
+ER RTOS_tsnd_dtq(mrb_state *mrb, ID id, intptr_t data, TMO tmout)
+{
+  return RTOS_snd_dtq(mrb, id, data, tmout);
+}
+
+ER RTOS_rcv_dtq(mrb_state *mrb, ID id, intptr_t *data, TMO tmout/*not use*/)
+{
+  if (id >= MAX_DTQ) {
+    return E_ID;
+  }
+  *data = ((intptr_t*)gcdtq[id].dtq.dtqmb)[gcdtq[id].rp];
+  gcdtq[id].rp = (gcdtq[id].rp + 1) % gcdtq[id].dtq.dtqcnt;
+  return 0;
+}
+
+ER RTOS_prcv_dtq(mrb_state *mrb, ID id, intptr_t *data, TMO tmout/*not use*/)
+{
+  return RTOS_rcv_dtq(mrb, id, data, tmout);
+}
+
+ER RTOS_trcv_dtq(mrb_state *mrb, ID id, intptr_t *data, TMO tmout)
+{
+  return RTOS_rcv_dtq(mrb, id, data, tmout);
+}
+
+#endif  /* EV3 */

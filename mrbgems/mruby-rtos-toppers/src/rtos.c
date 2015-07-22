@@ -7,6 +7,24 @@
 
 /* initialize functions */
 extern void mrb_rtos_memory_init(mrb_state*, struct RClass*);
+extern void mrb_rtos_dataqueue_init(mrb_state*, struct RClass*);
+
+TMO
+mrb_timeout_value(mrb_state *mrb, mrb_value tmo)
+{
+  if (mrb_fixnum_p(tmo)) {
+    return (TMO)mrb_fixnum(tmo);
+  }
+  if (mrb_symbol_p(tmo)) {
+    if (mrb_symbol(tmo) == mrb_intern_lit(mrb, "polling")) {
+      return (TMO)TMO_POL;
+    }
+    if (mrb_symbol(tmo) == mrb_intern_lit(mrb, "forever")) {
+      return (TMO)TMO_FEVR;
+    }
+  }
+  mrb_raisef(mrb, E_TYPE_ERROR, "wrong timeout value (%S)", tmo);
+}
 
 /*
  *  call-seq:
@@ -338,6 +356,9 @@ mrb_mruby_rtos_toppers_gem_init(mrb_state *mrb)
 
   /* MemoryPool, MemoryBuffer */
   mrb_rtos_memory_init(mrb, rtos);
+
+  /* DataQueue */
+  mrb_rtos_dataqueue_init(mrb, rtos);
 }
 
 void
