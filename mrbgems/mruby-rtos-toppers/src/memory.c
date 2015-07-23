@@ -62,7 +62,7 @@ mrb_mpl_init(mrb_state *mrb, mrb_value self)
     pcmpf->blkcnt = blkcnt;
     pcmpf->blksz  = blksz;
     pcmpf->mpf    = mrb_malloc(mrb, blksz * blkcnt);
-    id = RTOS_acre_mpf(pcmpf);
+    id = RTOS_acre_mpf(mrb, pcmpf);
   }
   else {
     id = mrb_fixnum(ido);
@@ -109,7 +109,7 @@ mrb_mbf_free(mrb_state *mrb, void *data)
   if (data) {
     mrb_mbf_t *mbf = (mrb_mbf_t*)data;
     if (mbf->buf) {
-      RTOS_rel_mpf(mbf->id, mbf->buf);
+      RTOS_rel_mpf(mrb, mbf->id, mbf->buf);
     }
     mrb_free(mrb, mbf);
   }
@@ -149,14 +149,14 @@ mrb_mbf_init(mrb_state *mrb, mrb_value self)
   data->blksz = blksz;
 
   if (mrb_fixnum_p(tmo)) {
-    RTOS_tget_mpf(id, &data->buf, mrb_fixnum(tmo));
+    RTOS_tget_mpf(mrb, id, &data->buf, mrb_fixnum(tmo));
   }
   else if (mrb_symbol_p(tmo)) {
     if (mrb_symbol(tmo) == mrb_intern_lit(mrb, "polling")) {
-      RTOS_pget_mpf(id, &data->buf);  /* Polling */
+      RTOS_pget_mpf(mrb, id, &data->buf);  /* Polling */
     }
     else if (mrb_symbol(tmo) == mrb_intern_lit(mrb, "forever")) {
-      RTOS_get_mpf(id, &data->buf);   /* Wati forever */
+      RTOS_get_mpf(mrb, id, &data->buf);   /* Wati forever */
     }
     else {
       mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid timeout value :%S", mrb_sym2str(mrb, mrb_symbol(tmo)));
@@ -185,7 +185,7 @@ mrb_mbf_rel(mrb_state *mrb, mrb_value self)
   mrb_mbf_t *mbf = DATA_PTR(self);
   if (mbf) {
     if (mbf->buf) {
-      RTOS_rel_mpf(mbf->id, mbf->buf);
+      RTOS_rel_mpf(mrb, mbf->id, mbf->buf);
     }
     mbf->buf = 0;   /* released */
     mbf->blksz = 0;

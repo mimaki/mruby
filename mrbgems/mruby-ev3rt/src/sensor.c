@@ -305,7 +305,7 @@ mrb_gyro_sensor_calibrate(mrb_state *mrb, mrb_value self)
     gsum += gyro;
     if (gyro > gmax) gmax = gyro;
     if (gyro < gmin) gmin = gyro;
-    RTOS_tslp_tsk(4);
+    RTOS_tslp_tsk(mrb, 4);
   }
   if(!(gmax - gmin < 2)) {
     offset = (mrb_float)gsum / 200.0f;

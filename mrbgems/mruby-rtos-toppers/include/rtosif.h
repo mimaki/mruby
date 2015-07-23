@@ -95,14 +95,14 @@ typedef struct t_cdtq {
 TMO mrb_timeout_value(mrb_state*, mrb_value);
 
 /* RTOS */
-ER RTOS_tslp_tsk(TMO);
-ER RTOS_get_tim(SYSTIM*);
+ER RTOS_tslp_tsk(mrb_state*, TMO);
+ER RTOS_get_tim(mrb_state*, SYSTIM*);
 
 /* Task */
-ER RTOS_act_tsk(ID);
-ER RTOS_sus_tsk(ID);
-ER RTOS_rsm_tsk(ID);
-ER RTOS_ter_tsk(ID);
+ER RTOS_act_tsk(mrb_state*, ID);
+ER RTOS_sus_tsk(mrb_state*, ID);
+ER RTOS_rsm_tsk(mrb_state*, ID);
+ER RTOS_ter_tsk(mrb_state*, ID);
 
 /* Semaphore */
 ER_ID RTOS_acre_sem(mrb_state*, T_CSEM*);
@@ -112,19 +112,19 @@ ER RTOS_pol_sem(mrb_state*, ID);
 ER RTOS_twai_sem(mrb_state*, ID, TMO);
 
 /* Event flag */
-ER_ID RTOS_acre_flg(T_CFLG*);
-ER RTOS_set_flg(ID, FLGPTN);
-ER RTOS_wai_flg(ID, FLGPTN, MODE, FLGPTN*);
-ER RTOS_pol_flg(ID, FLGPTN, MODE, FLGPTN*);
-ER RTOS_twai_flg(ID, FLGPTN, MODE, FLGPTN*, TMO);
-ER RTOS_clr_flg(ID, FLGPTN);
+ER_ID RTOS_acre_flg(mrb_state*, T_CFLG*);
+ER RTOS_set_flg(mrb_state*, ID, FLGPTN);
+ER RTOS_wai_flg(mrb_state*, ID, FLGPTN, MODE, FLGPTN*);
+ER RTOS_pol_flg(mrb_state*, ID, FLGPTN, MODE, FLGPTN*);
+ER RTOS_twai_flg(mrb_state*, ID, FLGPTN, MODE, FLGPTN*, TMO);
+ER RTOS_clr_flg(mrb_state*, ID, FLGPTN);
 
 /* Fixed size memory pool */
-ER_ID RTOS_acre_mpf(const T_CMPF*);
-ER RTOS_get_mpf(ID, void**);
-ER RTOS_pget_mpf(ID, void**);
-ER RTOS_tget_mpf(ID, void**, TMO);
-ER RTOS_rel_mpf(ID, void*);
+ER_ID RTOS_acre_mpf(mrb_state*, const T_CMPF*);
+ER RTOS_get_mpf(mrb_state*, ID, void**);
+ER RTOS_pget_mpf(mrb_state*, ID, void**);
+ER RTOS_tget_mpf(mrb_state*, ID, void**, TMO);
+ER RTOS_rel_mpf(mrb_state*, ID, void*);
 
 /* Data queue */
 ER_ID RTOS_acre_dtq(mrb_state*, const T_CDTQ*);

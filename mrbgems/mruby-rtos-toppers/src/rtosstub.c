@@ -7,38 +7,38 @@
 #ifndef EV3
 
 ER
-RTOS_tslp_tsk(TMO tmo)
+RTOS_tslp_tsk(mrb_state *mrb, TMO tmo)
 {
   return 0;
 }
 
 ER
-RTOS_get_tim(SYSTIM *st)
+RTOS_get_tim(mrb_state *mrb, SYSTIM *st)
 {
   *st = 0;
   return 0;
 }
 
 ER
-RTOS_act_tsk(ID id)
+RTOS_act_tsk(mrb_state *mrb, ID id)
 {
   return 0;
 }
 
 ER
-RTOS_sus_tsk(ID id)
+RTOS_sus_tsk(mrb_state *mrb, ID id)
 {
   return 0;
 }
 
 ER
-RTOS_rsm_tsk(ID id)
+RTOS_rsm_tsk(mrb_state *mrb, ID id)
 {
   return 0;
 }
 
 ER
-RTOS_ter_tsk(ID id)
+RTOS_ter_tsk(mrb_state *mrb, ID id)
 {
   return 0;
 }
@@ -66,38 +66,38 @@ ER RTOS_pol_sem(mrb_state *mrb, ID id)
 
 /* Event flag */
 ER
-RTOS_acre_flg(T_CFLG *pk_cflg)
+RTOS_acre_flg(mrb_state *mrb, T_CFLG *pk_cflg)
 {
   return 0;
 }
 
 ER
-RTOS_set_flg(ID id, FLGPTN ptn)
+RTOS_set_flg(mrb_state *mrb, ID id, FLGPTN ptn)
 {
   return ptn;
 }
 
 ER
-RTOS_wai_flg(ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn)
+RTOS_wai_flg(mrb_state *mrb, ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn)
 {
   *p_flgptn = waiptn;
   return 0;
 }
 
 ER
-RTOS_pol_flg(ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn)
+RTOS_pol_flg(mrb_state *mrb, ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn)
 {
   *p_flgptn = waiptn;
   return 0;
 }
 
-ER RTOS_twai_flg(ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn, TMO tmout)
+ER RTOS_twai_flg(mrb_state *mrb, ID id, FLGPTN waiptn, MODE wfmode, FLGPTN *p_flgptn, TMO tmout)
 {
   *p_flgptn = waiptn;
   return 0;
 }
 
-ER RTOS_clr_flg(ID id, FLGPTN clrptn)
+ER RTOS_clr_flg(mrb_state *mrb, ID id, FLGPTN clrptn)
 {
   return 0;
 }
@@ -106,7 +106,7 @@ ER RTOS_clr_flg(ID id, FLGPTN clrptn)
 static T_CMPF gcmpf[MAX_MPF] = {{0}};
 static ID gmpfid = 0;
 
-ER_ID RTOS_acre_mpf(const T_CMPF *pcmpf)
+ER_ID RTOS_acre_mpf(mrb_state *mrb, const T_CMPF *pcmpf)
 {
   ID id = gmpfid++;
   if (id >= MAX_MPF) {
@@ -116,7 +116,7 @@ ER_ID RTOS_acre_mpf(const T_CMPF *pcmpf)
   return id;
 }
 
-ER RTOS_get_mpf(ID id, void **pblk)
+ER RTOS_get_mpf(mrb_state *mrb, ID id, void **pblk)
 {
   if (id >= gmpfid || gcmpf[id].blksz == 0) {
     return -1;
@@ -125,17 +125,17 @@ ER RTOS_get_mpf(ID id, void **pblk)
   return 0;
 }
 
-ER RTOS_pget_mpf(ID id, void **pblk)
+ER RTOS_pget_mpf(mrb_state *mrb, ID id, void **pblk)
 {
-  return RTOS_get_mpf(id, pblk);
+  return RTOS_get_mpf(mrb, id, pblk);
 }
 
-ER RTOS_tget_mpf(ID id, void **pblk, TMO tmo)
+ER RTOS_tget_mpf(mrb_state *mrb, ID id, void **pblk, TMO tmo)
 {
-  return RTOS_get_mpf(id, pblk);
+  return RTOS_get_mpf(mrb, id, pblk);
 }
 
-ER RTOS_rel_mpf(ID id, void *pblk)
+ER RTOS_rel_mpf(mrb_state *mrb, ID id, void *pblk)
 {
   free(pblk);
   return 0;
