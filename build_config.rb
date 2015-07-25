@@ -136,3 +136,19 @@ MRuby::CrossBuild.new('arm-ev3rt') do |conf|
 
   conf.bins = %w()
 end
+
+MRuby::CrossBuild.new('arm-ev3rt-debug') do |conf|
+  toolchain :gccarm
+
+  conf.build_mrbtest_lib_only
+
+  enable_debug
+
+  conf.gembox 'arm-ev3rt'
+
+  conf.cc.defines += %w(EV3)
+  conf.cc.defines += %w(ENABLE_DEBUG)
+
+  conf.bins = %w()
+end
+
