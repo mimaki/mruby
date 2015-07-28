@@ -58,6 +58,24 @@ assert('EventFlag', 'wait(flg, mode, tmo)') do
   f.wait(0xf, :and, 10) == 0xf
 end
 
+assert('EventFlag', 'wait: parameter error') do
+  e1, e2, e3 = nil, nil, nil
+  f = RTOS::EventFlag.new
+  begin
+    f.wait(:hoge)
+  rescue => e1
+  end
+  begin
+    f.wait(1, :xor)
+  rescue => e2
+  end
+  begin
+    f.wait(1, :or, :unknown)
+  rescue => e3
+  end
+  e1 && e2 && e3
+end
+
 assert('EventFlag', 'clear') do
   f = RTOS::EventFlag.new
   f.clear == nil && f.clear(0x0f) == nil

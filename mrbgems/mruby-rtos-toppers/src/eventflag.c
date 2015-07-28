@@ -114,16 +114,34 @@ mrb_flag_wait(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "|ino", &waiptn, &mds, &tmo);
 
-  if (mrb_fixnum_p(tmo)) {
-    tmov = tmo;
+  if (mds == mrb_intern_lit(mrb, "and")) {
+    md = TWF_ANDW;
+  }
+  else if (mds == mrb_intern_lit(mrb, "or")) {
+    md = TWF_ORW;
   }
   else {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid mode value :%S", mrb_sym2str(mrb, mds));
+  }
+
+  if (mrb_fixnum_p(tmo)) {
+    RTOS_twai_flg(mrb, id, waiptn, md, &flgptn, mrb_fixnum(tmo));
+  }
+  else if (mrb_symbol_p(tmo)) {
     tmov = mrb_hash_get(mrb, tmap, tmo);
     if (mrb_nil_p(tmov)) {
       mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid timeout value :%S", mrb_sym2str(mrb, mrb_symbol(tmo)));
     }
+    if (mrb_symbol(tmov) == mrb_intern_lit(mrb, "forever")) {
+      RTOS_wai_flg(mrb, id, waiptn, md, &flgptn);
+    }
+    else {  /* polling */
+      RTOS_pol_flg(mrb, id, waiptn, md, &flgptn);
+    }
   }
-  RTOS_twai_flg(mrb, id, waiptn, md, &flgptn, mrb_fixnum(tmov));
+  else {
+    mrb_raisef(mrb, E_ARGUMENT_ERROR,  "invalid timeout value :%S", mrb_funcall(mrb, tmo, "to_s", 0));
+  }
 
   return mrb_fixnum_value(flgptn);
 }
