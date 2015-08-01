@@ -132,7 +132,7 @@ mrb_flag_wait(mrb_state *mrb, mrb_value self)
     if (mrb_nil_p(tmov)) {
       mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid timeout value :%S", mrb_sym2str(mrb, mrb_symbol(tmo)));
     }
-    if (mrb_symbol(tmov) == mrb_intern_lit(mrb, "forever")) {
+    if (mrb_symbol(tmo) == mrb_intern_lit(mrb, "forever")) {
       RTOS_wai_flg(mrb, id, waiptn, md, &flgptn);
     }
     else {  /* polling */
