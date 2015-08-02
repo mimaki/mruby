@@ -61,34 +61,44 @@ end
 #
 assert('LCD', 'new') do
   l1 = EV3RT::LCD.new
-  l1.instance_variable_get('@font')   == EV3RT::LCD::FONT[:small] &&
-  l1.instance_variable_get('@left')   == 0 &&
-  l1.instance_variable_get('@top')    == 0 &&
-  l1.instance_variable_get('@width')  == EV3RT::LCD::WIDTH &&
-  l1.instance_variable_get('@height') == EV3RT::LCD::HEIGHT &&
-  l1.instance_variable_get('@color')  == EV3RT::LCD::COLOR[:black]
+  # l1.instance_variable_get('@font')   == EV3RT::LCD::FONT[:small] &&
+  l1.font == EV3RT::LCD::FONT[:small] &&
+  # l1.instance_variable_get('@left')   == 0 &&
+  # l1.instance_variable_get('@top')    == 0 &&
+  l1.left   == 0 &&
+  l1.top    == 0 &&
+  # l1.instance_variable_get('@width')  == EV3RT::LCD::WIDTH &&
+  # l1.instance_variable_get('@height') == EV3RT::LCD::HEIGHT &&
+  l1.width  == EV3RT::LCD::WIDTH &&
+  l1.height == EV3RT::LCD::HEIGHT &&
+  # l1.instance_variable_get('@color')  == EV3RT::LCD::COLOR[:black]
+  l1.color  == EV3RT::LCD::COLOR[:black]
 end
 
 assert('LCD', 'new(font)') do
   l1 = EV3RT::LCD.new(:small)
   l2 = EV3RT::LCD.new(:medium)
-  l1.instance_variable_get('@font') == EV3RT::LCD::FONT[:small]
-  l2.instance_variable_get('@font') == EV3RT::LCD::FONT[:medium]
+  # l1.instance_variable_get('@font') == EV3RT::LCD::FONT[:small]
+  l1.font == EV3RT::LCD::FONT[:small] &&
+  # l2.instance_variable_get('@font') == EV3RT::LCD::FONT[:medium]
+  l2.font == EV3RT::LCD::FONT[:medium]
 end
 
 assert('LCD', 'new(font, x, y, w, h)') do
   l1 = EV3RT::LCD.new(:small, 1, 2, 3, 4)
-  l1.instance_variable_get('@left')    == 1 &&
-  l1.instance_variable_get('@top')     == 2 &&
-  l1.instance_variable_get('@width')   == 3 &&
-  l1.instance_variable_get('@height')  == 4
+  l1.left   == 1 &&
+  l1.top    == 2 &&
+  l1.width  == 3 &&
+  l1.height == 4
 end
 
 assert('LCD', 'new(font, x, y, w, h, col)') do
   l1 = EV3RT::LCD.new(:small, 1, 2, 3, 4, :white)
   l2 = EV3RT::LCD.new(:small, 1, 2, 3, 4, :black)
-  l1.instance_variable_get('@color') == EV3RT::LCD::COLOR[:white] &&
-  l2.instance_variable_get('@color') == EV3RT::LCD::COLOR[:black]
+  # l1.instance_variable_get('@color') == EV3RT::LCD::COLOR[:white] &&
+  # l2.instance_variable_get('@color') == EV3RT::LCD::COLOR[:black]
+  l1.color == EV3RT::LCD::COLOR[:white] &&
+  l2.color == EV3RT::LCD::COLOR[:black]
 end
 
 #

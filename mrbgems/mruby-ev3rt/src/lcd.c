@@ -4,6 +4,7 @@
 #include "mruby/variable.h"
 #include "mruby/string.h"
 #include "mruby/hash.h"
+#include "mruby/data.h"
 #include "ev3if.h"
 
 typedef struct ev3_font_size {
@@ -12,6 +13,25 @@ typedef struct ev3_font_size {
 } ev3_font_size;
 
 static ev3_font_size _font_size[2] = {{0, 8}, {0, 16}};
+
+/* LCD information */
+typedef struct mrb_lcd_t {
+  mrb_int font;   /* Font size (0:small, 1:medium) */
+  mrb_int left;   /* screen left */
+  mrb_int top;    /* screen top */
+  mrb_int width;  /* screen width */
+  mrb_int height; /* screen height */
+  mrb_int color;  /* foreground color */
+  mrb_int cx;     /* X coordinate of cursor */
+  mrb_int cy;     /* Y coordinate of cursor */
+} mrb_lcd_t;
+
+static void
+mrb_lcd_free(mrb_state *mrb, void *data)
+{
+  mrb_free(mrb, data);
+}
+const static struct mrb_data_type mrb_lcd_type = {"LCD", mrb_lcd_free};
 
 /*
  *  call-seq:
@@ -43,38 +63,32 @@ mrb_lcd_init(mrb_state *mrb, mrb_value self)
   mrb_sym col = mrb_intern_lit(mrb, "black");
   mrb_value fontv;
   mrb_value colv;
-  mrb_int fonti;
-  mrb_int x = 0;
-  mrb_int y = 0;
-  mrb_int w = EV3_LCD_WIDTH;
-  mrb_int h = EV3_LCD_HEIGHT;
+  mrb_lcd_t *plcd;
 
-  mrb_get_args(mrb, "|niiiin", &font, &x, &y, &w, &h, &col);
+  DATA_TYPE(self) = &mrb_lcd_type;
+  plcd = (mrb_lcd_t*)mrb_malloc(mrb, sizeof(mrb_lcd_t));
+  DATA_PTR(self) = plcd;
+  memset(plcd, 0, sizeof(mrb_lcd_t));
+  plcd->width  = EV3_LCD_WIDTH;
+  plcd->height = EV3_LCD_HEIGHT;
+
+  mrb_get_args(mrb, "|niiiin", &font, &plcd->left, &plcd->top, &plcd->width, &plcd->height, &col);
 
   fontv = mrb_hash_get(mrb, fmap, mrb_symbol_value(font));
   if (mrb_nil_p(fontv)) {
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid font size :%S", mrb_sym2str(mrb, font));
   }
-  fonti = mrb_fixnum(fontv);
-  if (_font_size[fonti].w == 0) {
+  plcd->font = mrb_fixnum(fontv);
+  if (_font_size[plcd->font].w == 0) {
     /* initialize font size at 1st time */
-    ev3_font_get_size(fonti, &_font_size[fonti].w, &_font_size[fonti].h);
+    ev3_font_get_size(plcd->font, &_font_size[plcd->font].w, &_font_size[plcd->font].h);
   }
 
   colv = mrb_hash_get(mrb, cmap, mrb_symbol_value(col));
   if (mrb_nil_p(colv)) {
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid foreground color :%S", mrb_sym2str(mrb, col));
   }
-
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@font"),   fontv);
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@left"),   mrb_fixnum_value(x));
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@top"),    mrb_fixnum_value(y));
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@width"),  mrb_fixnum_value(w));
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@height"), mrb_fixnum_value(h));
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@color"),  colv);
-
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cx"),     mrb_fixnum_value(0));
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cy"),     mrb_fixnum_value(0));
+  plcd->color = mrb_fixnum(colv);
 
   return self;
 }
@@ -111,6 +125,142 @@ mrb_lcd_set_font(mrb_state *mrb, mrb_value self)
   return mrb_nil_value();
 }
 
+/*
+ *  call-seq:
+ *     LCD.font # => Fixnum
+ *
+ *  Get the current font.
+ *
+ *  Parameters: None.
+ *
+ *  Returns font id. (0:small, 1:medium)
+ */
+static mrb_value
+mrb_lcd_get_font(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->font);
+}
+
+/*
+ *  call-seq:
+ *     LCD.left # => Fixnum
+ *
+ *  Get screen left.
+ *
+ *  Parameters: None.
+ *
+ *  Returns X coordinate.
+ */
+static mrb_value
+mrb_lcd_get_left(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->left);
+}
+
+/*
+ *  call-seq:
+ *     LCD.top # => Fixnum
+ *
+ *  Get screen top.
+ *
+ *  Parameters: None.
+ *
+ *  Returns Y coordinate.
+ */
+static mrb_value
+mrb_lcd_get_top(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->top);
+}
+
+/*
+ *  call-seq:
+ *     LCD.width # => Fixnum
+ *
+ *  Get screen width.
+ *
+ *  Parameters: None.
+ *
+ *  Returns screen width (pixels).
+ */
+static mrb_value
+mrb_lcd_get_width(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->width);
+}
+
+/*
+ *  call-seq:
+ *     LCD.height # => Fixnum
+ *
+ *  Get screen height.
+ *
+ *  Parameters: None.
+ *
+ *  Returns screen height (pixels).
+ */
+static mrb_value
+mrb_lcd_get_height(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->height);
+}
+
+/*
+ *  call-seq:
+ *     LCD.csrx # => Fixnum
+ *
+ *  Get X coordinate of cursor.
+ *
+ *  Parameters: None.
+ *
+ *  Returns cursor X  character coordinate.
+ */
+static mrb_value
+mrb_lcd_get_csrx(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->cx);
+}
+
+/*
+ *  call-seq:
+ *     LCD.csry # => Fixnum
+ *
+ *  Get Y coordinate of cursor.
+ *
+ *  Parameters: None.
+ *
+ *  Returns cursor Y  character coordinate.
+ */
+static mrb_value
+mrb_lcd_get_csry(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->cy);
+}
+
+/*
+ *  call-seq:
+ *     LCD.color # => Fixnum
+ *
+ *  Get foreground color.
+ *
+ *  Parameters: None.
+ *
+ *  Returns foreground color.
+ */
+static mrb_value
+mrb_lcd_get_color(mrb_state *mrb, mrb_value self)
+{
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  return mrb_fixnum_value(plcd->color);
+}
+
 static void
 mrb_lcd_get_font_size(mrb_state *mrb, mrb_value lcd, mrb_int *fw, mrb_int *fh)
 {
@@ -124,7 +274,8 @@ ev3_set_current_font(mrb_state *mrb, mrb_value self)
   static mrb_bool first = TRUE;
   struct RClass *lcd = mrb_obj_class(mrb, self);
   mrb_int current = mrb_fixnum(mrb_cv_get(mrb, mrb_obj_value(lcd), mrb_intern_lit(mrb, "@@font")));
-  mrb_int target  = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@font")));
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
+  mrb_int target  = plcd->font;
 
   if (first || current != target) {
     ev3_lcd_set_font((uint16_t)target);
@@ -136,57 +287,45 @@ ev3_set_current_font(mrb_state *mrb, mrb_value self)
 static void
 mrb_lcd_lf(mrb_state *mrb, mrb_value lcd)
 {
-  mrb_int sh = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@height")));
-#ifdef EV3
-  mrb_int sw = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@width")));
-  mrb_int x0 = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@left")));
-  mrb_int y0 = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@top")));
-  mrb_int fc = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@color")));
-  mrb_int cx = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@cx")));
-#endif
-  mrb_int cy = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@cy")));
-  mrb_int font = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@font")));
-  mrb_assert(font == EV3_FONT_SMALL || font == EV3_FONT_MEDIUM);
-  ev3_font_size *f = &_font_size[font];
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(lcd);
+  ev3_font_size *f = &_font_size[plcd->font];
+
+  mrb_assert(plcd->font == EV3_FONT_SMALL || plcd->font == EV3_FONT_MEDIUM);
   mrb_assert(f->w != 0 && f->h != 0);
-  mrb_int ch = sh / f->h;
 
 #ifdef EV3
-  ev3_lcd_fill_rect(x0+cx*f->w, y0+cy*f->h, sw-cx*f->w, f->h, fc ? 0 : 1);
+  ev3_lcd_fill_rect(
+    plcd->left  + plcd->cx * f->w,
+    plcd->top   + plcd->cy * f->h,
+    plcd->width - plcd->cx * f->w,
+    f->h,
+    plcd->color ? 0 : 1
+  );
 #else
   MRBEV3_PUTS("");
 #endif
 
-  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(0));
-  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value((cy+1) % ch));
+  plcd->cx = 0;
+  plcd->cy = (plcd->cy + 1) % (plcd->height / f->h);
 }
 
 static void
 mrb_lcd_print_line(mrb_state *mrb, mrb_value lcd, mrb_value *str)
 {
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(lcd);
   const char *src = mrb_string_value_cstr(mrb, str);
   size_t len = strlen(src);
   char *buf = mrb_malloc(mrb, len+1);
-  mrb_int font = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@font")));
-  mrb_assert(font == EV3_FONT_SMALL || font == EV3_FONT_MEDIUM);
-
-  mrb_assert(_font_size[font].w != 0 && _font_size[font].h != 0);
-  mrb_int x0 = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@left")));
-  mrb_int y0 = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@top")));
-  mrb_int sw = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@width")));
-  mrb_int sh = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@height")));
-#ifdef EV3
-  mrb_int fc = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@color")));
-#endif
-  mrb_int cx = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@cx")));
-  mrb_int cy = mrb_fixnum(mrb_iv_get(mrb, lcd, mrb_intern_lit(mrb, "@cy")));
-  mrb_int cw = sw / _font_size[font].w;
-  mrb_int ch = sh / _font_size[font].h;
-  ev3_font_size *f = &_font_size[font];
-  mrb_assert(f->w != 0 && f->h != 0);
-  mrb_int csr = cx;
+  ev3_font_size *f = &_font_size[plcd->font];
+  mrb_int cw;
+  mrb_int csr = plcd->cx;
   char *dst;
   mrb_bool lf;
+
+  mrb_assert(plcd->font == EV3_FONT_SMALL || plcd->font == EV3_FONT_MEDIUM);
+  mrb_assert(f->w != 0 && f->h != 0);
+
+  cw = plcd->width / f->w;
 
   memset(buf, 0, len+1);
   dst = buf;
@@ -205,16 +344,26 @@ mrb_lcd_print_line(mrb_state *mrb, mrb_value lcd, mrb_value *str)
     }
     if (lf) {
       *dst = '\0';
-      ev3_lcd_draw_string(buf, x0+cx*f->w, y0+cy*f->h);
+      ev3_lcd_draw_string(
+        buf,
+        plcd->left + plcd->cx * f->w,
+        plcd->top  + plcd->cy * f->h
+      );
 
       /* line feed */
 #ifdef EV3
-      ev3_lcd_fill_rect(x0+csr*f->w, y0+cy*f->h, sw-csr*f->w, f->h, fc ? 0 : 1);
+      ev3_lcd_fill_rect(
+        plcd->left  + csr * f->w,
+        plcd->top   + plcd->cy * f->h,
+        plcd->width - csr * f->w,
+        f->h,
+        plcd->color ? 0 : 1
+      );
 #else
       MRBEV3_PUTS("");
 #endif
-      cy = (cy+1) % ch;
-      cx = csr = 0;
+      plcd->cy = (plcd->cy + 1) % (plcd->height / f->h);
+      plcd->cx = csr = 0;
 
       memset(buf, 0, strlen(src)+1);
       dst = buf;
@@ -222,14 +371,17 @@ mrb_lcd_print_line(mrb_state *mrb, mrb_value lcd, mrb_value *str)
   }
   *dst = '\0';
   if (dst != buf) {
-    ev3_lcd_draw_string(buf, x0+cx*f->w, y0+cy*f->h);
+    ev3_lcd_draw_string(
+      buf,
+      plcd->left + plcd->cx * f->w,
+      plcd->top  + plcd->cy * f->h
+    );
   }
 
   mrb_free(mrb, buf);
 
   /* update cursor */
-  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(csr));
-  mrb_iv_set(mrb, lcd, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value(cy));
+  plcd->cx = csr;
 }
 
 /*
@@ -353,13 +505,14 @@ mrb_lcd_draw_string(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_lcd_locate(mrb_state *mrb, mrb_value self)
 {
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
   mrb_int x, y = -1;
 
   mrb_get_args(mrb, "i|i", &x, &y);
 
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(x));
+  plcd->cx = x;
   if (y >= 0) {
-    mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value(y));
+    plcd->cy = y;
   }
 
   return mrb_nil_value();
@@ -381,11 +534,11 @@ mrb_lcd_locate(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_lcd_clear(mrb_state *mrb, mrb_value self)
 {
+  mrb_lcd_t *plcd = (mrb_lcd_t*)DATA_PTR(self);
   struct RClass *lcd = mrb_obj_class(mrb, self);
   mrb_value cmap = mrb_const_get(mrb, mrb_obj_value(lcd), mrb_intern_lit(mrb, "COLOR"));
   mrb_sym col = mrb_intern_lit(mrb, "black");
   mrb_value colv;
-  mrb_int x, y, w, h;
 
   mrb_get_args(mrb, "|n", &col);
 
@@ -394,14 +547,14 @@ mrb_lcd_clear(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "invalid foreground color :%S", mrb_sym2str(mrb, col));
   }
 
-  x = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@left")));
-  y = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@top")));
-  w = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@width")));
-  h = mrb_fixnum(mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@height")));
-  ev3_lcd_fill_rect(x, y, w, h, mrb_fixnum(colv) ? 0 : 1);
-
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cx"), mrb_fixnum_value(0));
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@cy"), mrb_fixnum_value(0));
+  ev3_lcd_fill_rect(
+    plcd->left,
+    plcd->top,
+    plcd->width,
+    plcd->height,
+    mrb_fixnum(colv) ? 0 : 1
+  );
+  plcd->cx = plcd->cy = 0;
 
   return mrb_nil_value();
 }
@@ -436,11 +589,20 @@ mrb_ev3_lcd_init(mrb_state *mrb, struct RClass *ev3)
   mrb_define_class_method(mrb, lcd, "font=", mrb_lcd_set_font,    MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, lcd, "draw",  mrb_lcd_draw_string, MRB_ARGS_REQ(3));
 
-  mrb_define_method(mrb, lcd, "initialize", mrb_lcd_init,   MRB_ARGS_OPT(6));
-  mrb_define_method(mrb, lcd, "print",      mrb_lcd_print,  MRB_ARGS_ANY());
-  mrb_define_method(mrb, lcd, "puts",       mrb_lcd_puts,   MRB_ARGS_ANY());
-  mrb_define_method(mrb, lcd, "locate",     mrb_lcd_locate, MRB_ARGS_ARG(1, 1));
-  mrb_define_method(mrb, lcd, "clear",      mrb_lcd_clear,  MRB_ARGS_OPT(1));
+  mrb_define_method(mrb, lcd, "initialize", mrb_lcd_init,       MRB_ARGS_OPT(6));
+  mrb_define_method(mrb, lcd, "print",      mrb_lcd_print,      MRB_ARGS_ANY());
+  mrb_define_method(mrb, lcd, "puts",       mrb_lcd_puts,       MRB_ARGS_ANY());
+  mrb_define_method(mrb, lcd, "locate",     mrb_lcd_locate,     MRB_ARGS_ARG(1, 1));
+  mrb_define_method(mrb, lcd, "clear",      mrb_lcd_clear,      MRB_ARGS_OPT(1));
+
+  mrb_define_method(mrb, lcd, "font",       mrb_lcd_get_font,   MRB_ARGS_NONE());
+  mrb_define_method(mrb, lcd, "left",       mrb_lcd_get_left,   MRB_ARGS_NONE());
+  mrb_define_method(mrb, lcd, "top",        mrb_lcd_get_top,    MRB_ARGS_NONE());
+  mrb_define_method(mrb, lcd, "width",      mrb_lcd_get_width,  MRB_ARGS_NONE());
+  mrb_define_method(mrb, lcd, "height",     mrb_lcd_get_height, MRB_ARGS_NONE());
+  mrb_define_method(mrb, lcd, "cx",         mrb_lcd_get_csrx,   MRB_ARGS_NONE());
+  mrb_define_method(mrb, lcd, "cy",         mrb_lcd_get_csry,   MRB_ARGS_NONE());
+  mrb_define_method(mrb, lcd, "color",      mrb_lcd_get_color,  MRB_ARGS_NONE());
 
   // mrb_undef_method(mrb, mrb->kernel_module, "__printstr__");
   // mrb_define_method(mrb, mrb->kernel_module, "__printstr__", mrb_lcd_print, MRB_ARGS_ANY());
