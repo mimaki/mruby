@@ -60,7 +60,7 @@ mrb_balance_control(mrb_state *mrb, mrb_value self)
 }
 
 void
-mrb_mruby_ev3rt_gem_init(mrb_state *mrb)
+mrb_mruby_toppers_ev3rt_gem_init(mrb_state *mrb)
 {
   struct RClass *ev3;
   struct RClass *dev;
@@ -96,6 +96,6 @@ mrb_mruby_ev3rt_gem_init(mrb_state *mrb)
 }
 
 void
-mrb_mruby_ev3rt_gem_final(mrb_state *mrb)
+mrb_mruby_toppers_ev3rt_gem_final(mrb_state *mrb)
 {
 }

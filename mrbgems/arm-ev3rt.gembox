@@ -78,5 +78,5 @@ MRuby::GemBox.new do |conf|
   conf.gem :core => "mruby-rtos-toppers"
 
   # Use EV3RT libraries
-  conf.gem :core => "mruby-ev3rt"
+  conf.gem :core => "mruby-toppers-ev3rt"
 end

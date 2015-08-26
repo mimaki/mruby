@@ -102,7 +102,7 @@ mrb_motor_get_power(mrb_state *mrb, mrb_value self)
 
 /*
  *  call-seq:
- *     motor.stop(brk)  # => nil
+ *     motor.stop(brk=false)  # => nil
  *
  *  Stop the motor.
  *

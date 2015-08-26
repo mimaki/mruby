@@ -218,7 +218,7 @@ mrb_lcd_get_height(mrb_state *mrb, mrb_value self)
  *
  *  Parameters: None.
  *
- *  Returns cursor X  character coordinate.
+ *  Returns cursor X character coordinate.
  */
 static mrb_value
 mrb_lcd_get_csrx(mrb_state *mrb, mrb_value self)
@@ -235,7 +235,7 @@ mrb_lcd_get_csrx(mrb_state *mrb, mrb_value self)
  *
  *  Parameters: None.
  *
- *  Returns cursor Y  character coordinate.
+ *  Returns cursor Y character coordinate.
  */
 static mrb_value
 mrb_lcd_get_csry(mrb_state *mrb, mrb_value self)
