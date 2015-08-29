@@ -72,11 +72,11 @@ MRuby::GemBox.new do |conf|
   conf.gem :core => "mruby-kernel-ext"
 
   # Use tiny IO libraries
-  conf.gem :core => 'mruby-tiny-io'
+  conf.gem :git => "https://github.com/mimaki/mruby-tiny-io.git"
 
   # Use TOPPERS libraries
-  conf.gem :core => "mruby-rtos-toppers"
+  conf.gem :git => "https://github.com/mimaki/mruby-rtos-toppers.git"
 
   # Use EV3RT libraries
-  conf.gem :core => "mruby-toppers-ev3rt"
+  conf.gem :git => "https://github.com/mimaki/mruby-toppers-ev3rt.git"
 end
