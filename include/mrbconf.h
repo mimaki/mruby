@@ -26,7 +26,7 @@
 
 /* configuration options: */
 /* add -DMRB_USE_FLOAT to use float instead of double for floating point numbers */
-//#define MRB_USE_FLOAT
+#define MRB_USE_FLOAT
 
 /* add -DMRB_INT16 to use 16bit integer for mrb_int; conflict with MRB_INT64 */
 //#define MRB_INT16
@@ -53,10 +53,10 @@
 //#define MRB_HEAP_PAGE_SIZE 1024
 
 /* use segmented list for IV table */
-//#define MRB_USE_IV_SEGLIST
+#define MRB_USE_IV_SEGLIST
 
 /* initial size for IV khash; ignored when MRB_USE_IV_SEGLIST is set */
-//#define MRB_IVHASH_INIT_SIZE 8
+#define MRB_IVHASH_INIT_SIZE 8
 
 /* if _etext and _edata available, mruby can reduce memory used by symbols */
 //#define MRB_USE_ETEXT_EDATA
@@ -72,16 +72,16 @@
 //#define KHASH_DEFAULT_SIZE 32
 
 /* allocated memory address alignment */
-//#define POOL_ALIGNMENT 4
+#define POOL_ALIGNMENT 1
 
 /* page size of memory pool */
-//#define POOL_PAGE_SIZE 16000
+#define POOL_PAGE_SIZE 512
 
 /* initial minimum size for string buffer */
-//#define MRB_STR_BUF_MIN_SIZE 128
+#define MRB_STR_BUF_MIN_SIZE 32
 
 /* arena size */
-//#define MRB_GC_ARENA_SIZE 100
+// #define MRB_GC_ARENA_SIZE 100
 
 /* fixed size GC arena */
 //#define MRB_GC_FIXED_ARENA
@@ -93,7 +93,7 @@
 //#define MRB_FIXED_STATE_ATEXIT_STACK
 
 /* -DMRB_DISABLE_XXXX to drop following features */
-//#define MRB_DISABLE_STDIO	/* use of stdio */
+// #define MRB_DISABLE_STDIO	/* use of stdio */
 
 /* -DMRB_ENABLE_XXXX to enable following features */
 //#define MRB_ENABLE_DEBUG_HOOK	/* hooks for debugger */
